@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>ru.min</groupId>
-    <artifactId>SimleShopApiMS</artifactId>
+    <artifactId>SimpleShopApiMS</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>SimleShopApiMS</name>
-    <description>SimleShopApiMS</description>
+    <name>SimpleShopApiMS</name>
+    <description>SimpleShopApiMS</description>
     <properties>
         <java.version>17</java.version>
     </properties>
