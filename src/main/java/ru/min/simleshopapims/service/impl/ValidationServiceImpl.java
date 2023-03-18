@@ -71,4 +71,14 @@ public class ValidationServiceImpl implements ValidationService {
                 StringUtils.isNotBlank(review.getAuthor()) &&
                 StringUtils.isNotEmpty(review.getAuthor()));
     }
+
+    @Override
+    public boolean validateNotification(Notification notification){
+        return (StringUtils.isNotBlank(notification.getHeader()) &&
+                StringUtils.isNotEmpty(notification.getHeader()) &&
+                StringUtils.isNotEmpty(notification.getDescription()) &&
+                StringUtils.isNotBlank(notification.getDescription()) &&
+                StringUtils.isNotBlank(notification.getRecipient()) &&
+                StringUtils.isNotEmpty(notification.getRecipient()));
+    }
 }

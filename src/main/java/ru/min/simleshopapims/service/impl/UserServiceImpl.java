@@ -30,6 +30,7 @@ public class UserServiceImpl implements UserService {
     private final GradeService gradeService;
     private final ReviewService reviewService;
     private final PurchaseRepository purchaseRepository;
+    private final OrganizationService organizationService;
 
 
     @Override
@@ -64,7 +65,10 @@ public class UserServiceImpl implements UserService {
             List<Product> products = basketService.returnBasket().stream()
                     .peek(x -> x.setStockBalance(productService.findByName(x.getName()).getStockBalance() - x.getStockBalance()))
                     .peek(x -> productService.updateProduct(x, x.getId()))
+                    .peek(x -> organizationService.addProfit(x.getOrganization(),
+                            x.getOrganization().getProfit() + (x.getCost() - x.getCost() * 0.05)))
                     .collect(Collectors.toList());
+
             return purchase;
         } else {
             throw new TooMuchMoneyException("You dont have so much money(");
@@ -85,6 +89,8 @@ public class UserServiceImpl implements UserService {
                     .findFirst().get();
             if (purchase.getLocalDate().plusDays(1).isAfter(LocalDate.now())) {
                 purchase.getProducts().remove(product);
+                Organization organization = product.getOrganization();
+                organizationService.addProfit(organization, organization.getProfit() - (product.getCost() - product.getCost() * 0.05));
                 Product returnedProduct = productService.findByName(product.getName());
                 returnedProduct.setStockBalance(returnedProduct.getStockBalance() + product.getStockBalance());
                 productService.updateProduct(returnedProduct, returnedProduct.getId());
@@ -144,5 +150,19 @@ public class UserServiceImpl implements UserService {
     public AccountStatus changeAccountStatus(User user, AccountStatus accountStatus){
         user.setAccountStatus(accountStatus);
         return accountStatus;
+    }
+
+    @Override
+    public List<Notification> readNotifications(){
+        List<Notification> notifications = getCurrentUser().getNotifications();
+        return notifications.stream()
+                .filter(x -> x.getNotificationStatus().equals(NotificationStatus.NOT_READ))
+                .peek(x -> x.setNotificationStatus(NotificationStatus.READ))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Notification> showAllNotifications(){
+        return getCurrentUser().getNotifications();
     }
 }

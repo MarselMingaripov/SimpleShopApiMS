@@ -1,6 +1,7 @@
 package ru.min.simleshopapims.security.model;
 
 import lombok.Data;
+import ru.min.simleshopapims.model.Notification;
 import ru.min.simleshopapims.model.Purchase;
 
 import javax.persistence.*;
@@ -49,6 +50,12 @@ public class User {
     @Column(columnDefinition = "integer default 0")
     private double balance;
     private AccountStatus accountStatus;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_notifications",
+    joinColumns = @JoinColumn(name = "user_id"),
+    inverseJoinColumns = @JoinColumn(name = "notification_id"))
+    private List<Notification> notifications = new ArrayList<>();
 
     public User() {
     }

@@ -32,6 +32,8 @@ public class Organization {
     @OneToMany(fetch = FetchType.LAZY)
     private Set<Product> products;
 
+    private double profit;
+
     public Organization(String name, String description, String refToLogo, Set<Product> products) {
         this.name = name;
         this.description = description;

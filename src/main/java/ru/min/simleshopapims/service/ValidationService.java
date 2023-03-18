@@ -11,4 +11,6 @@ public interface ValidationService {
     boolean validateOrganization(Organization organization);
     boolean validateProduct(Product product);
     boolean validateReview(Review review);
+
+    boolean validateNotification(Notification notification);
 }

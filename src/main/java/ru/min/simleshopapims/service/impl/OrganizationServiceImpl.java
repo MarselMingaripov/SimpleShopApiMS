@@ -63,4 +63,9 @@ public class OrganizationServiceImpl implements OrganizationService {
     public List<Organization> findAll() {
         return organizationRepository.findAll();
     }
+
+    @Override
+    public void addProfit(Organization organization, double profit){
+        organization.setProfit(organization.getProfit() + profit);
+    }
 }

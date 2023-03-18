@@ -1,5 +1,6 @@
 package ru.min.simleshopapims.service;
 
+import ru.min.simleshopapims.model.Notification;
 import ru.min.simleshopapims.model.Product;
 import ru.min.simleshopapims.model.Purchase;
 import ru.min.simleshopapims.security.model.AccountStatus;
@@ -26,4 +27,8 @@ public interface UserService {
     List<Purchase> findAllByCurrentUser();
 
     AccountStatus changeAccountStatus(User user, AccountStatus accountStatus);
+
+    List<Notification> readNotifications();
+
+    List<Notification> showAllNotifications();
 }
