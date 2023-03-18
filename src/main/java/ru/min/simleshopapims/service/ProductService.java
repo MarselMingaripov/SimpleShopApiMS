@@ -1,0 +1,14 @@
+package ru.min.simleshopapims.service;
+
+import ru.min.simleshopapims.exception.MyValidationException;
+import ru.min.simleshopapims.model.Product;
+
+import java.util.List;
+
+public interface ProductService {
+
+    Product createProduct(Product product) throws MyValidationException;
+    void deleteProductById(Long id);
+    Product updateProduct(Product product, Long id);
+    List<Product> findAll();
+}

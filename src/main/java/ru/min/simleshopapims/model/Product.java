@@ -10,9 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "product", uniqueConstraints = {
-@UniqueConstraint(columnNames = "name")
-})
+@Table(name = "product")
 @Data
 @NoArgsConstructor
 public class Product {
