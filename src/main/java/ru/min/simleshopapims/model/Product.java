@@ -7,6 +7,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -64,6 +65,9 @@ public class Product {
             inverseJoinColumns = @JoinColumn(name = "grade_id"))
     private List<Grade> grade;
 
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<Purchase> purchases;
+
     public Product(String name, String description, Organization organization, double cost, int stockBalance,
                    Discount discount, Set<Review> reviews, Set<KeyWord> keyWords, Characteristic characteristic, List<Grade> grade) {
         this.name = name;
@@ -76,5 +80,18 @@ public class Product {
         this.keyWords = keyWords;
         this.characteristic = characteristic;
         this.grade = grade;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return Double.compare(product.cost, cost) == 0 && Objects.equals(name, product.name) && Objects.equals(description, product.description) && Objects.equals(organization, product.organization) && Objects.equals(discount, product.discount) && Objects.equals(keyWords, product.keyWords) && Objects.equals(characteristic, product.characteristic);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, description, organization, cost, discount, keyWords, characteristic);
     }
 }

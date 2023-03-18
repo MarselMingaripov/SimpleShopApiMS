@@ -2,8 +2,10 @@ package ru.min.simleshopapims.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.min.simleshopapims.exception.DontExistsByNameException;
 import ru.min.simleshopapims.exception.MyValidationException;
 import ru.min.simleshopapims.exception.NotFoundByIdException;
+import ru.min.simleshopapims.model.Grade;
 import ru.min.simleshopapims.model.Product;
 import ru.min.simleshopapims.repository.ProductRepository;
 import ru.min.simleshopapims.service.ProductService;
@@ -63,5 +65,37 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<Product> findAll() {
         return productRepository.findAll();
+    }
+
+    @Override
+    public Double returnCostWithDiscount(Product product){
+        if (validationService.validateDiscount(product.getDiscount())){
+            product.setCost(product.getCost() * product.getDiscount().getDiscountInPercent() / 100);
+            return product.getCost();
+        } else {
+            throw new MyValidationException("Discount has invalid fields!");
+        }
+    }
+
+    @Override
+    public Product findByName(String name){
+        if (productRepository.existsByName(name)) {
+            return productRepository.findByName(name).get();
+        } else {
+            throw new DontExistsByNameException("Product not found!");
+        }
+    }
+
+    @Override
+    public double showAvgGrade(Long id){
+        if (productRepository.existsById(id)){
+            List<Grade> gradeList = productRepository.findById(id).get().getGrade();
+            return gradeList.stream()
+                    .mapToDouble(x -> x.getGrade())
+                    .average()
+                    .orElse(0);
+        } else {
+            throw new DontExistsByNameException("Product not found!");
+        }
     }
 }

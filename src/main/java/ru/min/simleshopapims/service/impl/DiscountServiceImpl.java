@@ -7,11 +7,14 @@ import ru.min.simleshopapims.exception.MyValidationException;
 import ru.min.simleshopapims.exception.NotFoundByIdException;
 import ru.min.simleshopapims.model.Characteristic;
 import ru.min.simleshopapims.model.Discount;
+import ru.min.simleshopapims.model.Product;
 import ru.min.simleshopapims.repository.DiscountRepository;
+import ru.min.simleshopapims.repository.ProductRepository;
 import ru.min.simleshopapims.service.DiscountService;
 import ru.min.simleshopapims.service.ValidationService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +22,7 @@ public class DiscountServiceImpl implements DiscountService {
 
     private final DiscountRepository discountRepository;
     private final ValidationService validationService;
+    private final ProductRepository productRepository;
 
     @Override
     public Discount createDiscount(Discount discount) throws MyValidationException {
@@ -59,5 +63,32 @@ public class DiscountServiceImpl implements DiscountService {
     @Override
     public List<Discount> findAll() {
         return discountRepository.findAll();
+    }
+
+    @Override
+    public List<Product> setDiscountToListOfProducts(List<Product> products, Discount discount){
+        List<Product> productList = products.stream()
+                .filter(x -> productRepository.existsById(x.getId()))
+                .collect(Collectors.toList());
+        if (productList.size() == products.size()){
+            return products.stream()
+                    .peek(x -> x.setDiscount(discount))
+                    .peek(productRepository::save)
+                    .collect(Collectors.toList());
+        } else {
+            throw new NotFoundByIdException("Some products not found!");
+        }
+
+    }
+
+    @Override
+    public Product setDiscountToProduct(Product product, Discount discount) {
+        if (productRepository.existsById(product.getId())) {
+            Product pr = productRepository.findById(product.getId()).get();
+            pr.setDiscount(discount);
+            return productRepository.save(pr);
+        } else {
+            throw new NotFoundByIdException("Product not found!");
+        }
     }
 }

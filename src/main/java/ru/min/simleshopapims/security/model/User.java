@@ -1,13 +1,16 @@
 package ru.min.simleshopapims.security.model;
 
 import lombok.Data;
+import ru.min.simleshopapims.model.Purchase;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -38,6 +41,15 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinTable(	name = "user_purchases",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "purchase_id"))
+    private List<Purchase> purchaseList = new ArrayList<>();
+    @Column(columnDefinition = "integer default 0")
+    private double balance;
+    private AccountStatus accountStatus;
+
     public User() {
     }
 
@@ -45,5 +57,6 @@ public class User {
         this.username = username;
         this.password = password;
         this.email = email;
+        this.accountStatus = AccountStatus.ACTIVE;
     }
 }

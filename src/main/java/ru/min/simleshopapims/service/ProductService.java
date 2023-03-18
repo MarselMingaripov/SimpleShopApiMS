@@ -11,4 +11,10 @@ public interface ProductService {
     void deleteProductById(Long id);
     Product updateProduct(Product product, Long id);
     List<Product> findAll();
+
+    Double returnCostWithDiscount(Product product);
+
+    Product findByName(String name);
+
+    double showAvgGrade(Long id);
 }
