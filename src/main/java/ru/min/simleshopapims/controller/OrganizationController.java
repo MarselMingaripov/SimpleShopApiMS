@@ -123,8 +123,8 @@ public class OrganizationController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Организации успешно получены")})
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<List<Organization>> getAllOrganizationsByStatus(@PathVariable(required = true)OrganizationStatus organizationStatus){
-        return ResponseEntity.ok().body(organizationService.findAllByOrganizationStatus(organizationStatus));
+    public ResponseEntity<List<Organization>> getAllOrganizationsByStatus(@PathVariable(required = true)OrganizationStatus status){
+        return ResponseEntity.ok().body(organizationService.findAllByOrganizationStatus(status));
     }
 
     @GetMapping("/allByUser/{username}")

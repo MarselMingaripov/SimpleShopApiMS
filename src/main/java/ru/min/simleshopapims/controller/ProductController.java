@@ -135,7 +135,7 @@ public class ProductController {
         return ResponseEntity.ok().body(productService.setFrozenStatus(orgName, product));
     }
 
-    @PostMapping("/updateOwnProduct")
+    @PostMapping("/updateOwnProduct{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @Operation(summary = "Обновить данные о продукте")
     @ApiResponses(value = {

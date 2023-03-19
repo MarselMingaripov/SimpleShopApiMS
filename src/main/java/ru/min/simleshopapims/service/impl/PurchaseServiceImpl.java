@@ -1,6 +1,7 @@
 package ru.min.simleshopapims.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ru.min.simleshopapims.exception.NotFoundByIdException;
 import ru.min.simleshopapims.model.Purchase;
@@ -55,5 +56,11 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Override
     public List<Purchase> findAll() {
         return purchaseRepository.findAll();
+    }
+
+    @Override
+    public List<Purchase> findAllOwn(){
+        return userRepository.findUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+                .getPurchaseList();
     }
 }

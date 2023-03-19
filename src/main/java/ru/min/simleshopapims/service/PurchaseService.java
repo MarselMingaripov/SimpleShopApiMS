@@ -15,4 +15,5 @@ public interface PurchaseService {
 
     List<Purchase> findAll();
 
+    List<Purchase> findAllOwn();
 }
