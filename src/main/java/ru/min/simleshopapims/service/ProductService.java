@@ -13,6 +13,10 @@ public interface ProductService {
     Product updateProduct(Product product, Long id);
     List<Product> findAll();
 
+    List<Product> findAllWithDiscount();
+
+    List<Product> findAllWithAS();
+
     Double returnCostWithDiscount(Product product);
 
     Product findByName(String name);
@@ -21,7 +25,9 @@ public interface ProductService {
 
     Product applyToCreateProduct(Product product);
 
-    Product setFrozenStatus(Organization organization, Product product);
+    Product updateOwnProduct(Product product, Long id);
 
-    Product setActiveStatus(Organization organization, Product product);
+    Product setFrozenStatus(String organization, Product product);
+
+    Product setActiveStatus(String organization, Product product);
 }

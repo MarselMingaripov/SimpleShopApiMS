@@ -70,6 +70,8 @@ public class Product {
 
     private ProductStatus productStatus;
 
+    private double avgGrade;
+
     public Product(String name, String description, Organization organization, double cost, int stockBalance,
                    Discount discount, Set<KeyWord> keyWords, Characteristic characteristic) {
         this.name = name;
@@ -81,6 +83,7 @@ public class Product {
         this.keyWords = keyWords;
         this.characteristic = characteristic;
         this.productStatus = ProductStatus.PENDING;
+        this.avgGrade = 0;
     }
 
     @Override

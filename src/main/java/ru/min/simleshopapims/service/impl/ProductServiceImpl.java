@@ -6,10 +6,12 @@ import org.springframework.stereotype.Service;
 import ru.min.simleshopapims.exception.DontExistsByNameException;
 import ru.min.simleshopapims.exception.MyValidationException;
 import ru.min.simleshopapims.exception.NotFoundByIdException;
+import ru.min.simleshopapims.exception.OrgStatusException;
 import ru.min.simleshopapims.model.*;
 import ru.min.simleshopapims.repository.ProductRepository;
 import ru.min.simleshopapims.security.model.User;
 import ru.min.simleshopapims.security.repository.UserRepository;
+import ru.min.simleshopapims.service.DiscountService;
 import ru.min.simleshopapims.service.OrganizationService;
 import ru.min.simleshopapims.service.ProductService;
 import ru.min.simleshopapims.service.ValidationService;
@@ -25,6 +27,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final OrganizationService organizationService;
     private final UserRepository userRepository;
+    private final DiscountService discountService;
 
     /**
      * для админа создает активный продукт
@@ -77,10 +80,25 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<Product> findAll() {
+        return productRepository.findAll();
+    }
+
+    @Override
+    public List<Product> findAllWithDiscount() {
+        return productRepository.findAll().stream()
+                .peek(x -> x.setCost(returnCostWithDiscount(x)))
+                .peek(x -> x.setAvgGrade(showAvgGrade(x.getId())))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Product> findAllWithAS() {
         List<Product> products = productRepository.findAll();
         return products.stream()
                 .filter(x -> x.getOrganization().getOrganizationStatus().equals(OrganizationStatus.ACTIVE))
                 .filter(x -> x.getProductStatus().equals(ProductStatus.ACTIVE))
+                .peek(x -> x.setCost(returnCostWithDiscount(x)))
+                .peek(x -> x.setAvgGrade(showAvgGrade(x.getId())))
                 .collect(Collectors.toList());
     }
 
@@ -136,7 +154,27 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product setFrozenStatus(Organization organization, Product product){
+    public Product updateOwnProduct(Product product, Long id){
+        if (validationService.validateProduct(product)){
+            User user = userRepository.findUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+            if (user.getOrganizations().stream().filter(x -> x.getProducts().contains(product)).count() != 0) {
+                return updateProduct(product, id);
+            } else {
+                throw new DontExistsByNameException("You can update products only for your organization!");
+            }
+        } else {
+            throw new MyValidationException("Product has invalid fields!");
+        }
+    }
+
+    @Override
+    public Product setFrozenStatus(String organizationName, Product product){
+        Organization organization = organizationService.findAll().stream()
+                .filter(x -> x.getName().equals(organizationName))
+                .findFirst().orElse(null);
+        if (organization == null){
+            throw new DontExistsByNameException("Organization not found!");
+        }
         if (organization.getOrganizationStatus().equals(OrganizationStatus.ACTIVE)){
             if (organization.getProducts().contains(product)){
                 product.setProductStatus(ProductStatus.FROZEN);
@@ -150,16 +188,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product setActiveStatus(Organization organization, Product product){
-        if (organization.getOrganizationStatus().equals(OrganizationStatus.ACTIVE)){
+    public Product setActiveStatus(String organizationName, Product product){
+        Organization organization = organizationService.findAll().stream()
+                .filter(x -> x.getName().equals(organizationName))
+                .findFirst().orElse(null);
+        if (organization == null){
+            throw new DontExistsByNameException("Organization not found!");
+        }
             if (organization.getProducts().contains(product)){
                 product.setProductStatus(ProductStatus.ACTIVE);
                 return updateProduct(product, product.getId());
             } else {
                 throw new NotFoundByIdException("Product not found!");
             }
-        } else {
-            throw new RuntimeException("Check organization status!");
-        }
     }
 }
