@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface UserService {
 
-    Double setBalance(User user, double amount);
+    Double setBalance(String username, double amount);
 
     User getCurrentUser();
 

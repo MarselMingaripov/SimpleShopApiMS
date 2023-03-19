@@ -1,6 +1,7 @@
 package ru.min.simleshopapims.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,9 +35,14 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public Double setBalance(User user, double amount) {
-        user.setBalance(user.getBalance() + amount);
-        return user.getBalance();
+    public Double setBalance(String username, double amount) {
+        if (userRepository.existsByUsername(username)){
+            User user = userRepository.findUserByUsername(username);
+            user.setBalance(user.getBalance() + amount);
+            return user.getBalance();
+        } else {
+            throw new DontExistsByNameException("User not found!");
+        }
     }
 
     @Override
@@ -56,22 +62,26 @@ public class UserServiceImpl implements UserService {
     @Override
     public Purchase buy() {
         checkStatus(getCurrentUser());
-        Purchase purchase = new Purchase(LocalDate.now(), basketService.returnBasket(), getCurrentUser(), basketService.returnTotalCost());
-        purchase.setPurchaseStatus(PurchaseStatus.INPROCESS);
-        if (getCurrentUser().getBalance() >= basketService.returnTotalCost()) {
-            purchase.setPurchaseStatus(PurchaseStatus.COMPLETED);
-            purchaseService.createPurchase(purchase);
-            getCurrentUser().getPurchaseList().add(purchase);
-            List<Product> products = basketService.returnBasket().stream()
-                    .peek(x -> x.setStockBalance(productService.findByName(x.getName()).getStockBalance() - x.getStockBalance()))
-                    .peek(x -> productService.updateProduct(x, x.getId()))
-                    .peek(x -> organizationService.addProfit(x.getOrganization(),
-                            x.getOrganization().getProfit() + (x.getCost() - x.getCost() * 0.05)))
-                    .collect(Collectors.toList());
-
-            return purchase;
+        if (!basketService.returnBasket().isEmpty()) {
+            Purchase purchase = new Purchase(LocalDate.now(), basketService.returnBasket(), getCurrentUser(), basketService.returnTotalCost());
+            purchase.setPurchaseStatus(PurchaseStatus.INPROCESS);
+            if (getCurrentUser().getBalance() >= basketService.returnTotalCost()) {
+                purchase.setPurchaseStatus(PurchaseStatus.COMPLETED);
+                purchaseService.createPurchase(purchase);
+                getCurrentUser().getPurchaseList().add(purchase);
+                List<Product> products = basketService.returnBasket().stream()
+                        .peek(x -> x.setStockBalance(productService.findByName(x.getName()).getStockBalance() - x.getStockBalance()))
+                        .peek(x -> productService.updateProduct(x, x.getId()))
+                        .peek(x -> organizationService.addProfit(x.getOrganization(),
+                                x.getOrganization().getProfit() + (x.getCost() - x.getCost() * 0.05)))
+                        .collect(Collectors.toList());
+                basketService.returnBasket().clear();
+                return purchase;
+            } else {
+                throw new TooMuchMoneyException("You dont have so much money(");
+            }
         } else {
-            throw new TooMuchMoneyException("You dont have so much money(");
+            throw new EmptyBasketException("Basket is empty!");
         }
     }
 

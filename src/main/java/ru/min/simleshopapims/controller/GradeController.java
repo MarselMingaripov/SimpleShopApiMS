@@ -57,7 +57,7 @@ public class GradeController {
         return ResponseEntity.ok().body(gradeService.updateGrade(grade, id));
     }
 
-    @GetMapping("/allWithAS")
+    @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Получить список оценок. Только админ")
     @ApiResponses(value = {

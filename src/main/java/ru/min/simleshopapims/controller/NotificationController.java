@@ -56,7 +56,7 @@ public class NotificationController {
         return ResponseEntity.ok().body(notificationService.showAllNotifications());
     }
 
-    @GetMapping("/allOwn")
+    @GetMapping("/all-own")
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @Operation(summary = "Получить все уведомления текущего пользователя")
     @ApiResponses(value = {

@@ -57,7 +57,7 @@ public class ProductController {
         return ResponseEntity.ok().body(productService.updateProduct(product, id));
     }
 
-    @GetMapping("/allWithAS")
+    @GetMapping("/all-with-AS")
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @Operation(summary = "Получить список продуктов с активным статусом с учетом скидки")
     @ApiResponses(value = {
@@ -67,7 +67,7 @@ public class ProductController {
         return ResponseEntity.ok().body(productService.findAllWithAS());
     }
 
-    @GetMapping("/allWithoutDiscount")
+    @GetMapping("/all-without-discount")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Получить список всех продуктов без учета скидки. Только админ")
     @ApiResponses(value = {
@@ -77,7 +77,7 @@ public class ProductController {
         return ResponseEntity.ok().body(productService.findAll());
     }
 
-    @GetMapping("/allWithDiscount")
+    @GetMapping("/all-with-discount")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Получить список всех продуктов с учетом скидки. Только админ")
     @ApiResponses(value = {
@@ -88,8 +88,8 @@ public class ProductController {
     }
 
     @GetMapping("/{name}")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Получить продукт по названию. Только админ")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @Operation(summary = "Получить продукт по названию")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Продукт успешно получен"),
             @ApiResponse(responseCode = "404", description = "Продукт не найден")})
@@ -98,7 +98,7 @@ public class ProductController {
         return ResponseEntity.ok().body(productService.findByName(name));
     }
 
-    @PostMapping("/applyToCreateProduct")
+    @PostMapping("/apply-to-create-product")
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @Operation(summary = "Подать заявку на добавление продукта")
     @ApiResponses(value = {
@@ -110,7 +110,7 @@ public class ProductController {
         return ResponseEntity.ok().body(productService.applyToCreateProduct(product));
     }
 
-    @PostMapping("/setActive")
+    @PostMapping("/set-active")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Сделать статус продукта активным. Только админ")
     @ApiResponses(value = {
@@ -123,7 +123,7 @@ public class ProductController {
         return ResponseEntity.ok().body(productService.setActiveStatus(orgName, product));
     }
 
-    @PostMapping("/setFrozen")
+    @PostMapping("/set-frozen")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Сделать статус продукта замороженным. Только админ")
     @ApiResponses(value = {
@@ -135,7 +135,7 @@ public class ProductController {
         return ResponseEntity.ok().body(productService.setFrozenStatus(orgName, product));
     }
 
-    @PostMapping("/updateOwnProduct{id}")
+    @PostMapping("/update-own-product/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @Operation(summary = "Обновить данные о продукте")
     @ApiResponses(value = {

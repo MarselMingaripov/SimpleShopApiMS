@@ -56,4 +56,10 @@ public class ExceptionsHandler {
     public ResponseEntity<String> orgStatusExceptionHandler(OrgStatusException e){
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    //411
+    @ExceptionHandler
+    public ResponseEntity<String> emptyBasketExceptionHandler(EmptyBasketException e){
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.LENGTH_REQUIRED);
+    }
 }

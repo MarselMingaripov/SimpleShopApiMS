@@ -77,7 +77,7 @@ public class PurchaseController {
         return ResponseEntity.ok().body(purchaseService.findAllByUsername(username));
     }
 
-    @GetMapping("/allOwn")
+    @GetMapping("/all-own")
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @Operation(summary = "Получить список покупок текущего пользователя")
     @ApiResponses(value = {

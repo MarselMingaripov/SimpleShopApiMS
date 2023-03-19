@@ -68,7 +68,7 @@ public class DiscountController {
         return ResponseEntity.ok().body(discountService.findAll());
     }
 
-    @PostMapping("/setDiscountToList/{id}")
+    @PostMapping("/set-discount-to-list/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Найти скидку по ИД и установить для списка продуктов. Только админ")
     @ApiResponses(value = {
@@ -80,9 +80,9 @@ public class DiscountController {
         return ResponseEntity.ok().body(discountService.setDiscountToListOfProducts(products, id));
     }
 
-    @PostMapping("/setDiscountToListByUser/{id}")
+    @PostMapping("/set-discount-to-list-by-user/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
-    @Operation(summary = "Найти скидку по ИД и установить для списка продуктов")
+    @Operation(summary = "Найти скидку по ИД и установить для списка своих продуктов")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Скидка успешно установлена"),
             @ApiResponse(responseCode = "404", description = "Скидка не найдена"),
@@ -92,7 +92,7 @@ public class DiscountController {
         return ResponseEntity.ok().body(discountService.setDiscountToListOfOwnProducts(products, id));
     }
 
-    @PostMapping("/setDiscount/{id}")
+    @PostMapping("/set-discount/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Найти скидку по ИД и установить для одного продукта. Только админ")
     @ApiResponses(value = {
@@ -104,9 +104,9 @@ public class DiscountController {
         return ResponseEntity.ok().body(discountService.setDiscountToProduct(product, id));
     }
 
-    @PostMapping("/setDiscountByUser/{id}")
+    @PostMapping("/set-discount-by-user/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
-    @Operation(summary = "Найти скидку по ИД и установить для одного продукта. Только админ")
+    @Operation(summary = "Найти скидку по ИД и установить для одного своего продукта")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Скидка успешно установлена"),
             @ApiResponse(responseCode = "404", description = "Скидка не найдена"),

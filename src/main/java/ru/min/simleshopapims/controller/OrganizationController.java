@@ -11,7 +11,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.min.simleshopapims.model.Organization;
 import ru.min.simleshopapims.model.OrganizationStatus;
-import ru.min.simleshopapims.model.Product;
 import ru.min.simleshopapims.service.OrganizationService;
 
 import java.util.List;
@@ -71,7 +70,7 @@ public class OrganizationController {
         return ResponseEntity.ok().body(organizationService.findAll());
     }
 
-    @PostMapping("/applyToCreate")
+    @PostMapping("/apply-to-create")
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @Operation(summary = "Отправить запрос на создание организации от пользователя")
     @ApiResponses(value = {
@@ -84,7 +83,7 @@ public class OrganizationController {
         return ResponseEntity.ok().body(organizationService.applyToCreateOrg(organization));
     }
 
-    @PostMapping("/makeActive/{name}")
+    @PostMapping("/make-active/{name}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Установить организации статус активной")
     @ApiResponses(value = {
@@ -95,7 +94,7 @@ public class OrganizationController {
         return ResponseEntity.ok().body(organizationService.makeActive(name));
     }
 
-    @PostMapping("/makeFrozen/{name}")
+    @PostMapping("/make-frozen/{name}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Установить организации статус замороженной")
     @ApiResponses(value = {
@@ -106,7 +105,7 @@ public class OrganizationController {
         return ResponseEntity.ok().body(organizationService.makeFrozen(name));
     }
 
-    @PostMapping("/makeBanned/{name}")
+    @PostMapping("/make-banned/{name}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Установить организации статус забаненной")
     @ApiResponses(value = {
@@ -117,7 +116,7 @@ public class OrganizationController {
         return ResponseEntity.ok().body(organizationService.makeBanned(name));
     }
 
-    @GetMapping("/allByStatus/{status}")
+    @GetMapping("/all-by-status/{status}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Получить список всех организаций по статусу")
     @ApiResponses(value = {
@@ -127,7 +126,7 @@ public class OrganizationController {
         return ResponseEntity.ok().body(organizationService.findAllByOrganizationStatus(status));
     }
 
-    @GetMapping("/allByUser/{username}")
+    @GetMapping("/all-by-user/{username}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Получить список всех организаций по пользователю")
     @ApiResponses(value = {
@@ -138,7 +137,7 @@ public class OrganizationController {
         return ResponseEntity.ok().body(organizationService.findByOwner(username));
     }
 
-    @GetMapping("/allOwn")
+    @GetMapping("/all-own")
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @Operation(summary = "Получить список всех своих организаций")
     @ApiResponses(value = {
