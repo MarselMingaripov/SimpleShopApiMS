@@ -12,6 +12,10 @@ public interface DiscountService {
     void deleteDiscountById(Long id);
     Discount updateDiscount(Discount discount, Long id);
     List<Discount> findAll();
-    List<Product> setDiscountToListOfProducts(List<Product> products, Discount discount);
-    Product setDiscountToProduct(Product product, Discount discount);
+    List<Product> setDiscountToListOfProducts(List<Product> products, Long discountId);
+    Product setDiscountToProduct(Product product, Long discountId);
+
+    List<Product> setDiscountToListOfOwnProducts(List<Product> products, Long discountId);
+
+    Product setDiscountToOwnProduct(Product product, Long discountId);
 }
