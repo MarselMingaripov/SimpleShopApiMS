@@ -9,5 +9,9 @@ public interface NotificationService {
 
     List<Notification> showAllNotificationsByUsername(String username);
 
-    List<Notification> sendNotification(Notification notification);
+    List<Notification> showAllNotifications();
+
+    List<Notification> showOwnNotifications();
+
+    Notification sendNotification(Notification notification);
 }

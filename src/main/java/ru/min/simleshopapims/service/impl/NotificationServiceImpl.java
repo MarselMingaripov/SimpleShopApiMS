@@ -1,6 +1,7 @@
 package ru.min.simleshopapims.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ru.min.simleshopapims.exception.DontExistsByNameException;
 import ru.min.simleshopapims.exception.MyValidationException;
@@ -25,7 +26,7 @@ public class NotificationServiceImpl implements NotificationService {
     public Notification createNotification(Notification notification) {
         if (validationService.validateNotification(notification)) {
             if (userRepository.existsByUsername(notification.getRecipient())) {
-                return notificationRepository.save(notification);
+                return notificationRepository.save(sendNotification(notification));
             } else {
                 throw new DontExistsByNameException("User not found!");
             }
@@ -44,12 +45,22 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public List<Notification> sendNotification(Notification notification) {
-        createNotification(notification);
+    public List<Notification> showAllNotifications() {
+        return notificationRepository.findAll();
+    }
+
+    @Override
+    public List<Notification> showOwnNotifications(){
+        return userRepository.findUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+                .getNotifications();
+    }
+
+    @Override
+    public Notification sendNotification(Notification notification) {
         User user = userRepository.findUserByUsername(notification.getRecipient());
         List<Notification> userNotifications = user.getNotifications();
         userNotifications.add(notification);
         user.setNotifications(userNotifications);
-        return userNotifications;
+        return notification;
     }
 }
