@@ -5,6 +5,7 @@ import ru.min.simleshopapims.model.Organization;
 import ru.min.simleshopapims.model.OrganizationStatus;
 
 import java.util.List;
+import java.util.Set;
 
 public interface OrganizationService {
 
@@ -26,4 +27,6 @@ public interface OrganizationService {
     List<Organization> findAllByOrganizationStatus(OrganizationStatus organizationStatus);
 
     List<Organization> findByOwner(String owner);
+
+    Set<Organization> findOwnOrganizations();
 }

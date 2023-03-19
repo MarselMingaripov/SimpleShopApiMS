@@ -49,7 +49,7 @@ public class ProductController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Обновить продукт по ИД. Только админ")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Продукт успешно удален"),
+            @ApiResponse(responseCode = "200", description = "Продукт успешно обновлен"),
             @ApiResponse(responseCode = "404", description = "Продукт не найден"),
             @ApiResponse(responseCode = "405", description = "Ошибка валидации полей продукта")})
     @SecurityRequirement(name = "bearerAuth")
