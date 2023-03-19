@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.min.simleshopapims.model.Characteristic;
-import ru.min.simleshopapims.model.Product;
 import ru.min.simleshopapims.service.CharacteristicService;
 
 import java.util.List;

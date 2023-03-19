@@ -50,7 +50,7 @@ public class DiscountController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Обновить скидку по ИД. Только админ")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Скидка успешно удален"),
+            @ApiResponse(responseCode = "200", description = "Скидка успешно обновлена"),
             @ApiResponse(responseCode = "404", description = "Скидка не найден"),
             @ApiResponse(responseCode = "405", description = "Ошибка валидации полей скидки")})
     @SecurityRequirement(name = "bearerAuth")
