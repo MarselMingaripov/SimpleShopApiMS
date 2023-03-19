@@ -31,4 +31,6 @@ public interface UserService {
     List<Notification> readNotifications();
 
     List<Notification> showAllNotifications();
+
+    double addManyFromOrgToBalance();
 }

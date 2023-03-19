@@ -2,6 +2,7 @@ package ru.min.simleshopapims.security.model;
 
 import lombok.Data;
 import ru.min.simleshopapims.model.Notification;
+import ru.min.simleshopapims.model.Organization;
 import ru.min.simleshopapims.model.Purchase;
 
 import javax.persistence.*;
@@ -56,6 +57,12 @@ public class User {
     joinColumns = @JoinColumn(name = "user_id"),
     inverseJoinColumns = @JoinColumn(name = "notification_id"))
     private List<Notification> notifications = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(	name = "user_organizations",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "organization_id"))
+    private Set<Organization> organizations = new HashSet<>();
 
     public User() {
     }

@@ -165,4 +165,15 @@ public class UserServiceImpl implements UserService {
     public List<Notification> showAllNotifications(){
         return getCurrentUser().getNotifications();
     }
+
+    @Override
+    public double addManyFromOrgToBalance(){
+        List<Organization> organizations = organizationService.findByOwner(getCurrentUser().getUsername());
+        for (Organization organization : organizations) {
+            getCurrentUser().setBalance(getCurrentUser().getBalance() + organization.getProfit());
+            organization.setProfit(0);
+            organizationService.updateOrganization(organization, organization.getId());
+        }
+        return getCurrentUser().getBalance();
+    }
 }

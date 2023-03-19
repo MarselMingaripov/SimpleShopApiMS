@@ -68,18 +68,19 @@ public class Product {
     @OneToMany(fetch = FetchType.LAZY)
     private List<Purchase> purchases;
 
+    private ProductStatus productStatus;
+
     public Product(String name, String description, Organization organization, double cost, int stockBalance,
-                   Discount discount, Set<Review> reviews, Set<KeyWord> keyWords, Characteristic characteristic, List<Grade> grade) {
+                   Discount discount, Set<KeyWord> keyWords, Characteristic characteristic) {
         this.name = name;
         this.description = description;
         this.organization = organization;
         this.cost = cost;
         this.stockBalance = stockBalance;
         this.discount = discount;
-        this.reviews = reviews;
         this.keyWords = keyWords;
         this.characteristic = characteristic;
-        this.grade = grade;
+        this.productStatus = ProductStatus.PENDING;
     }
 
     @Override

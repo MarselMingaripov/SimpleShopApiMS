@@ -1,6 +1,7 @@
 package ru.min.simleshopapims.service;
 
 import ru.min.simleshopapims.exception.MyValidationException;
+import ru.min.simleshopapims.model.Organization;
 import ru.min.simleshopapims.model.Product;
 
 import java.util.List;
@@ -17,4 +18,10 @@ public interface ProductService {
     Product findByName(String name);
 
     double showAvgGrade(Long id);
+
+    Product applyToCreateProduct(Product product);
+
+    Product setFrozenStatus(Organization organization, Product product);
+
+    Product setActiveStatus(Organization organization, Product product);
 }

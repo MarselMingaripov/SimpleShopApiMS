@@ -32,12 +32,17 @@ public class Organization {
     @OneToMany(fetch = FetchType.LAZY)
     private Set<Product> products;
 
-    private double profit;
+    private String owner;
 
-    public Organization(String name, String description, String refToLogo, Set<Product> products) {
+    private double profit;
+    private OrganizationStatus organizationStatus;
+
+    public Organization(String name, String description, String refToLogo, String owner) {
         this.name = name;
         this.description = description;
         this.refToLogo = refToLogo;
-        this.products = products;
+        this.owner = owner;
+        this.products = null;
+        this.organizationStatus = OrganizationStatus.PENDING;
     }
 }
