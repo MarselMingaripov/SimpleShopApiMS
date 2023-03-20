@@ -8,6 +8,7 @@ import ru.min.simleshopapims.exception.MyValidationException;
 import ru.min.simleshopapims.exception.NotFoundByIdException;
 import ru.min.simleshopapims.exception.OrgStatusException;
 import ru.min.simleshopapims.model.*;
+import ru.min.simleshopapims.model.dto.ProductDto;
 import ru.min.simleshopapims.repository.ProductRepository;
 import ru.min.simleshopapims.security.model.User;
 import ru.min.simleshopapims.security.repository.UserRepository;
@@ -31,13 +32,15 @@ public class ProductServiceImpl implements ProductService {
 
     /**
      * для админа создает активный продукт
-     * @param product
+     *
+     * @param productDto
      * @return
      * @throws MyValidationException
      */
     @Override
-    public Product createProduct(Product product) throws MyValidationException {
-        if (validationService.validateProduct(product)){
+    public Product createProduct(ProductDto productDto) throws MyValidationException {
+        Product product = new Product(productDto.getName(), productDto.getDescription(), productDto.getCost(), productDto.getStockBalance(), productDto.getProductStatus());
+        if (validationService.validateProduct(product)) {
             product.setProductStatus(ProductStatus.ACTIVE);
             /*product.getCharacteristic().stream()
                     .forEach(characteristicService::createCharacteristic);
@@ -55,7 +58,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void deleteProductById(Long id) {
-        if (productRepository.existsById(id)){
+        if (productRepository.existsById(id)) {
             productRepository.delete(productRepository.findById(id).get());
         } else {
             throw new NotFoundByIdException("Product not found!");
@@ -64,8 +67,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product updateProduct(Product product, Long id) {
-        if (validationService.validateProduct(product)){
-            if (productRepository.existsById(id)){
+        if (validationService.validateProduct(product)) {
+            if (productRepository.existsById(id)) {
                 Product pr = productRepository.findById(id).get();
                 pr.setCharacteristic(product.getCharacteristic());
                 pr.setCost(product.getCost());
@@ -88,6 +91,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<Product> findAll() {
+
         return productRepository.findAll();
     }
 
@@ -98,17 +102,14 @@ public class ProductServiceImpl implements ProductService {
                 .peek(x -> x.setCost(returnCostWithDiscount(x)))
                 .peek(x -> x.setAvgGrade(showAvgGrade(x.getId())))
                 .collect(Collectors.toList());
-        if (!products.isEmpty()){
-            return products;
-        } else {
-            throw new NotFoundByIdException("Discount not found!");
-        }
+        return products;
     }
 
     @Override
     public List<Product> findAllWithAS() {
         List<Product> products = productRepository.findAll();
         return products.stream()
+                .filter(x -> x.getOrganization() != null)
                 .filter(x -> x.getOrganization().getOrganizationStatus().equals(OrganizationStatus.ACTIVE))
                 .filter(x -> x.getProductStatus().equals(ProductStatus.ACTIVE))
                 .peek(x -> x.setCost(returnCostWithDiscount(x)))
@@ -117,8 +118,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Double returnCostWithDiscount(Product product){
-        if (validationService.validateDiscount(product.getDiscount())){
+    public Double returnCostWithDiscount(Product product) {
+        if (product.getDiscount() == null) {
+            return product.getCost();
+        }
+        if (validationService.validateDiscount(product.getDiscount())) {
             product.setCost(product.getCost() * product.getDiscount().getDiscountInPercent() / 100);
             return product.getCost();
         } else {
@@ -127,7 +131,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product findByName(String name){
+    public Product findByName(String name) {
         if (productRepository.existsByName(name)) {
             return productRepository.findByName(name).get();
         } else {
@@ -136,8 +140,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public double showAvgGrade(Long id){
-        if (productRepository.existsById(id)){
+    public double showAvgGrade(Long id) {
+        if (productRepository.existsById(id)) {
             List<Grade> gradeList = productRepository.findById(id).get().getGrade();
             return gradeList.stream()
                     .mapToDouble(x -> x.getGrade())
@@ -150,12 +154,13 @@ public class ProductServiceImpl implements ProductService {
 
     /**
      * для пользователя, заявка на создание продукта
+     *
      * @param product
      * @return
      */
     @Override
-    public Product applyToCreateProduct(Product product){
-        if (validationService.validateProduct(product)){
+    public Product applyToCreateProduct(Product product) {
+        if (validationService.validateProduct(product)) {
             User user = userRepository.findUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
             if (user.getOrganizations().contains(product.getOrganization())) {
                 return productRepository.save(product);
@@ -168,10 +173,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product updateOwnProduct(Product product, Long id){
-        if (validationService.validateProduct(product)){
+    public Product updateOwnProduct(Product product, Long id) {
+        if (validationService.validateProduct(product)) {
             User user = userRepository.findUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-            if (user.getOrganizations().stream().filter(x -> x.getProducts().contains(product)).count() != 0) {
+            if (user.getOrganizations().stream().anyMatch(x -> x.getProducts().contains(product))) {
                 return updateProduct(product, id);
             } else {
                 throw new DontExistsByNameException("You can update products only for your organization!");
@@ -182,15 +187,15 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product setFrozenStatus(String organizationName, Product product){
+    public Product setFrozenStatus(String organizationName, Product product) {
         Organization organization = organizationService.findAll().stream()
                 .filter(x -> x.getName().equals(organizationName))
                 .findFirst().orElse(null);
-        if (organization == null){
+        if (organization == null) {
             throw new DontExistsByNameException("Organization not found!");
         }
-        if (organization.getOrganizationStatus().equals(OrganizationStatus.ACTIVE)){
-            if (organization.getProducts().contains(product)){
+        if (organization.getOrganizationStatus().equals(OrganizationStatus.ACTIVE)) {
+            if (organization.getProducts().contains(product)) {
                 product.setProductStatus(ProductStatus.FROZEN);
                 return updateProduct(product, product.getId());
             } else {
@@ -202,25 +207,42 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product setActiveStatus(String organizationName, Product product){
+    public Product setActiveStatus(String organizationName, Product product) {
         Organization organization = organizationService.findAll().stream()
                 .filter(x -> x.getName().equals(organizationName))
                 .findFirst().orElse(null);
-        if (organization == null){
+        if (organization == null) {
             throw new DontExistsByNameException("Organization not found!");
         }
-            if (organization.getProducts().contains(product)){
-                product.setProductStatus(ProductStatus.ACTIVE);
-                return updateProduct(product, product.getId());
-            } else {
-                throw new NotFoundByIdException("Product not found!");
-            }
+        if (organization.getProducts().contains(product)) {
+            product.setProductStatus(ProductStatus.ACTIVE);
+            return updateProduct(product, product.getId());
+        } else {
+            throw new NotFoundByIdException("Product not found!");
+        }
     }
 
     @Override
     public Product findById(Long id) {
-        if (productRepository.existsById(id)){
+        if (productRepository.existsById(id)) {
             return productRepository.findById(id).get();
+        } else {
+            throw new NotFoundByIdException("Product not found!");
+        }
+    }
+
+    @Override
+    public Product setOrganization(Long productId, Long orgId){
+        if (productRepository.existsById(productId)){
+            Product product = productRepository.findById(productId).get();
+            Organization organization = organizationService.findById(orgId);
+            product.setOrganization(organization);
+            Set<Product> products = organization.getProducts();
+            products.add(product);
+            organization.setProducts(products);
+            updateProduct(product, productId);
+            //organizationService.updateOrganization(organization, orgId);
+            return product;
         } else {
             throw new NotFoundByIdException("Product not found!");
         }

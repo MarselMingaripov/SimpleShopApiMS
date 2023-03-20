@@ -1,9 +1,11 @@
 package ru.min.simleshopapims.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -18,7 +20,8 @@ public class Organization {
     private String name;
     private String description;
     private String refToLogo;
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonBackReference
     private Set<Product> products;
 
     private String owner;
@@ -33,5 +36,18 @@ public class Organization {
         this.owner = owner;
         this.products = null;
         this.organizationStatus = OrganizationStatus.PENDING;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Organization that = (Organization) o;
+        return Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(refToLogo, that.refToLogo) && Objects.equals(owner, that.owner);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, description, refToLogo, owner);
     }
 }

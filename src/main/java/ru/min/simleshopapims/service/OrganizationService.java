@@ -3,13 +3,15 @@ package ru.min.simleshopapims.service;
 import ru.min.simleshopapims.exception.MyValidationException;
 import ru.min.simleshopapims.model.Organization;
 import ru.min.simleshopapims.model.OrganizationStatus;
+import ru.min.simleshopapims.model.Product;
+import ru.min.simleshopapims.model.dto.OrganizationDto;
 
 import java.util.List;
 import java.util.Set;
 
 public interface OrganizationService {
 
-    Organization createOrganization(Organization organization) throws MyValidationException;
+    Organization createOrganization(OrganizationDto organizationDto) throws MyValidationException;
     void deleteOrganizationById(Long id);
     Organization updateOrganization(Organization organization, Long id);
     List<Organization> findAll();
@@ -29,4 +31,8 @@ public interface OrganizationService {
     List<Organization> findByOwner(String owner);
 
     List<Organization> findOwnOrganizations();
+
+    Organization findById(Long id);
+
+    Set<Product> getProductsByOrgName(String name);
 }

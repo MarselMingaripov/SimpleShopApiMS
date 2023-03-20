@@ -3,12 +3,13 @@ package ru.min.simleshopapims.service;
 import ru.min.simleshopapims.exception.MyValidationException;
 import ru.min.simleshopapims.model.Organization;
 import ru.min.simleshopapims.model.Product;
+import ru.min.simleshopapims.model.dto.ProductDto;
 
 import java.util.List;
 
 public interface ProductService {
 
-    Product createProduct(Product product) throws MyValidationException;
+    Product createProduct(ProductDto productDto) throws MyValidationException;
     void deleteProductById(Long id);
     Product updateProduct(Product product, Long id);
     List<Product> findAll();
@@ -32,4 +33,6 @@ public interface ProductService {
     Product setActiveStatus(String organization, Product product);
 
     Product findById(Long id);
+
+    Product setOrganization(Long productId, Long orgId);
 }

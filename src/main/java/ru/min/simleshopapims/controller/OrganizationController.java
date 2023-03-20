@@ -11,6 +11,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.min.simleshopapims.model.Organization;
 import ru.min.simleshopapims.model.OrganizationStatus;
+import ru.min.simleshopapims.model.Product;
+import ru.min.simleshopapims.model.dto.OrganizationDto;
 import ru.min.simleshopapims.service.OrganizationService;
 
 import java.util.List;
@@ -32,7 +34,7 @@ public class OrganizationController {
             @ApiResponse(responseCode = "405", description = "Ошибка валидации полей продукта"),
             @ApiResponse(responseCode = "409", description = "Организация с таким именем уже существует")})
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<Organization> createOrganization(@RequestBody Organization organization){
+    public ResponseEntity<Organization> createOrganization(@RequestBody OrganizationDto organization){
         return ResponseEntity.ok().body(organizationService.createOrganization(organization));
     }
 
@@ -145,5 +147,16 @@ public class OrganizationController {
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<List<Organization>> getAllOwnOrganizations(){
         return ResponseEntity.ok().body(organizationService.findOwnOrganizations());
+    }
+
+    @GetMapping("/products-by-organization-name/{name}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @Operation(summary = "Получить список всех продуктов организации по имени")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Организации успешно получены"),
+            @ApiResponse(responseCode = "409", description = "Организации не найдена")})
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<Set<Product>> getAllProductsByName(@PathVariable String name){
+        return ResponseEntity.ok().body(organizationService.getProductsByOrgName(name));
     }
 }

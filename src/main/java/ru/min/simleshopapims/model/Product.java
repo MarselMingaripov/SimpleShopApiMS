@@ -1,5 +1,6 @@
 package ru.min.simleshopapims.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Cascade;
@@ -30,6 +31,7 @@ public class Product {
     @JoinTable(name = "product_organization",
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "organization_id"))
+    @JsonManagedReference
     private Organization organization;
     @NotNull
     private double cost;
@@ -84,16 +86,32 @@ public class Product {
         this.avgGrade = 0;
     }
 
+    public Product(String name, String description, double cost, int stockBalance, ProductStatus productStatus) {
+        this.name = name;
+        this.description = description;
+        this.cost = cost;
+        this.stockBalance = stockBalance;
+        this.productStatus = productStatus;
+        this.organization = null;
+        this.discount = null;
+        this.reviews = null;
+        this.keyWords = null;
+        this.characteristic = null;
+        this.grade = null;
+        this.purchases = null;
+        this.avgGrade = 0;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Product product = (Product) o;
-        return Double.compare(product.cost, cost) == 0 && Objects.equals(name, product.name) && Objects.equals(description, product.description) && Objects.equals(organization, product.organization) && Objects.equals(discount, product.discount) && Objects.equals(keyWords, product.keyWords) && Objects.equals(characteristic, product.characteristic);
+        return Double.compare(product.cost, cost) == 0 && stockBalance == product.stockBalance && Objects.equals(name, product.name) && Objects.equals(description, product.description);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, organization, cost, discount, keyWords, characteristic);
+        return Objects.hash(name, description, cost, stockBalance);
     }
 }

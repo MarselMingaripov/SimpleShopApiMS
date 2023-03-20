@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.min.simleshopapims.model.Product;
+import ru.min.simleshopapims.model.dto.ProductDto;
 import ru.min.simleshopapims.service.ProductService;
 
 import java.util.List;
@@ -29,7 +30,7 @@ public class ProductController {
             @ApiResponse(responseCode = "200", description = "Продукт успешно создан"),
             @ApiResponse(responseCode = "405", description = "Ошибка валидации полей продукта")})
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<Product> createProduct(@RequestBody Product product){
+    public ResponseEntity<Product> createProduct(@RequestBody ProductDto product){
         return ResponseEntity.ok().body(productService.createProduct(product));
     }
 
@@ -146,5 +147,16 @@ public class ProductController {
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Product> updateOwnProduct(@RequestBody Product product, @PathVariable(required = true) Long id ){
         return ResponseEntity.ok().body(productService.updateOwnProduct(product, id));
+    }
+
+    @PostMapping("/set-organization")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Установить организацию. Только админ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Организация успешно установлена"),
+            @ApiResponse(responseCode = "404", description = "Организация или продукт не найдены")})
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<Product> setOrg(@RequestParam(required = true) Long prId, @RequestParam(required = true) Long orgId){
+        return ResponseEntity.ok().body(productService.setOrganization(prId, orgId));
     }
 }

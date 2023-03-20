@@ -8,6 +8,8 @@ import ru.min.simleshopapims.exception.MyValidationException;
 import ru.min.simleshopapims.exception.NotFoundByIdException;
 import ru.min.simleshopapims.model.Organization;
 import ru.min.simleshopapims.model.OrganizationStatus;
+import ru.min.simleshopapims.model.Product;
+import ru.min.simleshopapims.model.dto.OrganizationDto;
 import ru.min.simleshopapims.repository.OrganizationRepository;
 import ru.min.simleshopapims.security.model.User;
 import ru.min.simleshopapims.security.repository.UserRepository;
@@ -28,12 +30,13 @@ public class OrganizationServiceImpl implements OrganizationService {
     /**
      * для админа, создание активной организации
      *
-     * @param organization
+     * @param organizationDto
      * @return
      * @throws MyValidationException
      */
     @Override
-    public Organization createOrganization(Organization organization) throws MyValidationException {
+    public Organization createOrganization(OrganizationDto organizationDto) throws MyValidationException {
+        Organization organization = new Organization(organizationDto.getName(), organizationDto.getDescription(), organizationDto.getRefToLogo(), organizationDto.getOwner());
         if (validationService.validateOrganization(organization)) {
             if (!organizationRepository.existsByName(organization.getName())) {
                 organization.setOrganizationStatus(OrganizationStatus.ACTIVE);
@@ -157,6 +160,24 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public List<Organization> findOwnOrganizations(){
         return organizationRepository.findAllByOwner(SecurityContextHolder.getContext().getAuthentication().getName());
+    }
+
+    @Override
+    public Organization findById(Long id){
+        if (organizationRepository.existsById(id)){
+            return organizationRepository.findById(id).get();
+        } else {
+            throw new NotFoundByIdException("Organization not found!");
+        }
+    }
+
+    @Override
+    public Set<Product> getProductsByOrgName(String name){
+        if (organizationRepository.existsByName(name)){
+            return organizationRepository.findByName(name).get().getProducts();
+        } else {
+            throw new DontExistsByNameException("Organization not found!");
+        }
     }
 
 }
