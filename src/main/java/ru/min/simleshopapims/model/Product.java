@@ -65,9 +65,7 @@ public class Product {
             inverseJoinColumns = @JoinColumn(name = "grade_id"))
     private List<Grade> grade;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<Purchase> purchases;
-
+    @Enumerated(EnumType.STRING)
     private ProductStatus productStatus;
 
     private double avgGrade;
@@ -98,7 +96,6 @@ public class Product {
         this.keyWords = null;
         this.characteristic = null;
         this.grade = null;
-        this.purchases = null;
         this.avgGrade = 0;
     }
 

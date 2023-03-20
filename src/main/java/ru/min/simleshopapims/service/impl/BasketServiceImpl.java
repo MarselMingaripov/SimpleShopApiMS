@@ -2,7 +2,9 @@ package ru.min.simleshopapims.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.min.simleshopapims.exception.DontExistsByNameException;
 import ru.min.simleshopapims.model.Product;
+import ru.min.simleshopapims.repository.ProductRepository;
 import ru.min.simleshopapims.service.BasketService;
 
 import java.util.ArrayList;
@@ -13,11 +15,17 @@ import java.util.List;
 public class BasketServiceImpl implements BasketService {
 
     private final List<Product> basket = new ArrayList<>();
+    private final ProductRepository productRepository;
 
     @Override
-    public List<Product> addToBasket(Product product){
-        basket.add(product);
-        return basket;
+    public List<Product> addToBasket(String productName){
+        if (productRepository.existsByName(productName)){
+            Product product = productRepository.findByName(productName).get();
+            basket.add(product);
+            return basket;
+        } else {
+            throw new DontExistsByNameException("Product not found!");
+        }
     }
 
     @Override
@@ -27,8 +35,10 @@ public class BasketServiceImpl implements BasketService {
 
     @Override
     public double returnTotalCost(){
-        return basket.stream()
-                .peek(x -> x.getCost())
-                .count();
+        double sum = 0;
+        for (Product product : basket) {
+            sum += product.getCost();
+        }
+        return sum;
     }
 }

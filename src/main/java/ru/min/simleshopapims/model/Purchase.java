@@ -1,5 +1,6 @@
 package ru.min.simleshopapims.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.min.simleshopapims.security.model.User;
@@ -19,14 +20,16 @@ public class Purchase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private LocalDate localDate;
-    @OneToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "purchase_products",
             joinColumns = @JoinColumn(name = "purchase_id"),
             inverseJoinColumns = @JoinColumn(name = "product_id"))
     private List<Product> products;
     @ManyToOne(fetch = FetchType.EAGER)
+    @JsonManagedReference
     private User user;
     private double totalCost;
+    @Enumerated(EnumType.STRING)
     private PurchaseStatus purchaseStatus;
 
     public Purchase(LocalDate localDate, List<Product> products, User user, double totalCost) {

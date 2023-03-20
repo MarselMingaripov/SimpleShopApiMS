@@ -19,6 +19,7 @@ public class Notification {
     private LocalDate localDate;
     private String description;
     private String recipient;
+    @Enumerated(EnumType.STRING)
     private NotificationStatus notificationStatus;
 
     public Notification(String header, LocalDate localDate, String description, String recipient) {

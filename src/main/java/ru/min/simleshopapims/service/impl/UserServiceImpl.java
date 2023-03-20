@@ -75,8 +75,10 @@ public class UserServiceImpl implements UserService {
                         .peek(x -> productService.updateProduct(x, x.getId()))
                         .peek(x -> organizationService.addProfit(x.getOrganization(),
                                 x.getOrganization().getProfit() + (x.getCost() - x.getCost() * 0.05)))
+                        .peek(x -> organizationService.updateOrganization(x.getOrganization(), x.getOrganization().getId()))
                         .collect(Collectors.toList());
                 getCurrentUser().setBalance(getCurrentUser().getBalance() - basketService.returnTotalCost());
+                userRepository.save(getCurrentUser());
                 basketService.returnBasket().clear();
                 return purchase;
             } else {
@@ -107,6 +109,7 @@ public class UserServiceImpl implements UserService {
                 returnedProduct.setStockBalance(returnedProduct.getStockBalance() + product.getStockBalance());
                 productService.updateProduct(returnedProduct, returnedProduct.getId());
                 getCurrentUser().setBalance(getCurrentUser().getBalance() + returnedProduct.getCost());
+                userRepository.save(getCurrentUser());
                 return purchaseService.updatePurchase(purchase, purchase.getId());
             } else {
                 throw new ItsTooLateException("Sorry, its too late to return your purchase. You can return it during a day!");
@@ -120,7 +123,9 @@ public class UserServiceImpl implements UserService {
     public Product putGrade(Long id, int grade) {
         checkStatus(getCurrentUser());
         Grade gr = new Grade(grade);
-        if (getCurrentUser().getPurchaseList().contains(productService.findById(id))) {
+        if (getCurrentUser().getPurchaseList().stream()
+                .flatMap(x ->x.getProducts().stream())
+                .anyMatch(x -> x.equals(productService.findById(id)))) {
             gradeService.createGrade(gr);
             Product pr = getCurrentUser().getPurchaseList().stream()
                     .flatMap(x -> x.getProducts().stream())
@@ -129,6 +134,9 @@ public class UserServiceImpl implements UserService {
             List<Grade> gradeList = pr.getGrade();
             gradeList.add(gr);
             pr.setGrade(gradeList);
+            double avgGr = pr.getGrade().stream().mapToDouble(x -> x.getGrade()).average().orElse(0);
+            pr.setAvgGrade(avgGr);
+            productService.updateProduct(pr, pr.getId());
             return pr;
         } else {
             throw new ProductIsNotBoughtException("Product is not bought!");
@@ -139,7 +147,9 @@ public class UserServiceImpl implements UserService {
     public Product putReview(Long id, String name, String review) {
         checkStatus(getCurrentUser());
         Review rv = new Review(name, review, getCurrentUser().getUsername());
-        if (getCurrentUser().getPurchaseList().contains(productService.findById(id))) {
+        if (getCurrentUser().getPurchaseList().stream()
+                .flatMap(x ->x.getProducts().stream())
+                .anyMatch(x -> x.equals(productService.findById(id)))) {
             reviewService.createReview(rv);
             Product pr = getCurrentUser().getPurchaseList().stream()
                     .flatMap(x -> x.getProducts().stream())
@@ -148,6 +158,7 @@ public class UserServiceImpl implements UserService {
             Set<Review> reviews = pr.getReviews();
             reviews.add(rv);
             pr.setReviews(reviews);
+            productService.updateProduct(pr, pr.getId());
             return pr;
         } else {
             throw new ProductIsNotBoughtException("Product is not bought!");

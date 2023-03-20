@@ -1,5 +1,6 @@
 package ru.min.simleshopapims.security.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 import ru.min.simleshopapims.model.Notification;
 import ru.min.simleshopapims.model.Organization;
@@ -47,6 +48,7 @@ public class User {
     @JoinTable(	name = "user_purchases",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "purchase_id"))
+    @JsonBackReference
     private List<Purchase> purchaseList = new ArrayList<>();
     @Column(columnDefinition = "integer default 0")
     private double balance;

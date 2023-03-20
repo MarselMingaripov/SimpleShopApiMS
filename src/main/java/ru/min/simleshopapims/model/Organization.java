@@ -27,6 +27,7 @@ public class Organization {
     private String owner;
 
     private double profit;
+    @Enumerated(EnumType.STRING)
     private OrganizationStatus organizationStatus;
 
     public Organization(String name, String description, String refToLogo, String owner) {

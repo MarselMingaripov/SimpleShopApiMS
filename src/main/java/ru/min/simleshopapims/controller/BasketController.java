@@ -8,10 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.min.simleshopapims.model.Product;
 import ru.min.simleshopapims.service.BasketService;
 
@@ -29,9 +26,10 @@ public class BasketController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @Operation(summary = "Добавить продукт в корзину")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Продукт успешно добавлен")})
+            @ApiResponse(responseCode = "200", description = "Продукт успешно добавлен"),
+            @ApiResponse(responseCode = "409", description = "Продукт не найден")})
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<List<Product>> addToBasket(@RequestBody Product product){
-        return ResponseEntity.ok().body(basketService.addToBasket(product));
+    public ResponseEntity<List<Product>> addToBasket(@RequestParam String productName){
+        return ResponseEntity.ok().body(basketService.addToBasket(productName));
     }
 }
