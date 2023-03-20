@@ -1,5 +1,6 @@
 package ru.min.simleshopapims.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -40,6 +41,7 @@ public class Product {
     @JoinTable(name = "product_discount",
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "discount_id"))
+    @JsonBackReference
     private Discount discount;
     @OneToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "product_reviews",

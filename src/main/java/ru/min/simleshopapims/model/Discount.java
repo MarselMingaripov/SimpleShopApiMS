@@ -1,5 +1,6 @@
 package ru.min.simleshopapims.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -7,6 +8,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -20,19 +22,14 @@ public class Discount {
     private Long id;
 
     @OneToMany(fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Product> namesOfProducts;
-    @NotNull
-    @NotBlank
     private int discountInPercent;
-    @NotNull
-    @NotBlank
     private LocalDate startOfDiscount;
-    @NotNull
-    @NotBlank
     private LocalDate endOfDiscount;
 
-    public Discount(List<Product> namesOfProducts, int discountInPercent, LocalDate startOfDiscount, LocalDate endOfDiscount) {
-        this.namesOfProducts = namesOfProducts;
+    public Discount(int discountInPercent, LocalDate startOfDiscount, LocalDate endOfDiscount) {
+        this.namesOfProducts = new ArrayList<>();
         this.discountInPercent = discountInPercent;
         this.startOfDiscount = startOfDiscount;
         this.endOfDiscount = endOfDiscount;

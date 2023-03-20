@@ -1,9 +1,6 @@
 package ru.min.simleshopapims.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ru.min.simleshopapims.exception.*;
@@ -134,7 +131,7 @@ public class UserServiceImpl implements UserService {
             List<Grade> gradeList = pr.getGrade();
             gradeList.add(gr);
             pr.setGrade(gradeList);
-            double avgGr = pr.getGrade().stream().mapToDouble(x -> x.getGrade()).average().orElse(0);
+            double avgGr = pr.getGrade().stream().mapToDouble(Grade::getGrade).average().orElse(0);
             pr.setAvgGrade(avgGr);
             productService.updateProduct(pr, pr.getId());
             return pr;

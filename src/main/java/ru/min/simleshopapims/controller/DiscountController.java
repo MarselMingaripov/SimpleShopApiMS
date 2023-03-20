@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.min.simleshopapims.model.Discount;
 import ru.min.simleshopapims.model.Product;
+import ru.min.simleshopapims.model.dto.DiscountDto;
 import ru.min.simleshopapims.service.DiscountService;
 
 import java.util.List;
@@ -30,8 +31,8 @@ public class DiscountController {
             @ApiResponse(responseCode = "200", description = "Скидка успешно создан"),
             @ApiResponse(responseCode = "405", description = "Ошибка валидации полей скидки")})
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<Discount> createDiscount(@RequestBody Discount discount){
-        return ResponseEntity.ok().body(discountService.createDiscount(discount));
+    public ResponseEntity<Discount> createDiscount(@RequestBody DiscountDto discountDto){
+        return ResponseEntity.ok().body(discountService.createDiscount(discountDto));
     }
 
     @DeleteMapping("/{id}")
@@ -76,8 +77,8 @@ public class DiscountController {
             @ApiResponse(responseCode = "404", description = "Скидка не найдена"),
             @ApiResponse(responseCode = "409", description = "Некоторые продукты в списке не удалось найти")})
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<List<Product>> setDiscountForListOfProductsByAdmin(@RequestBody List<Product> products, @PathVariable(required = true) Long id){
-        return ResponseEntity.ok().body(discountService.setDiscountToListOfProducts(products, id));
+    public ResponseEntity<List<Product>> setDiscountForListOfProductsByAdmin(@RequestBody List<Long> productsId, @PathVariable(required = true) Long id){
+        return ResponseEntity.ok().body(discountService.setDiscountToListOfProducts(productsId, id));
     }
 
     @PostMapping("/set-discount-to-list-by-user/{id}")
@@ -100,8 +101,8 @@ public class DiscountController {
             @ApiResponse(responseCode = "404", description = "Скидка не найдена"),
             @ApiResponse(responseCode = "409", description = "Некоторые продукты в списке не удалось найти")})
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<Product> setDiscountForProductByAdmin(@RequestBody Product product, @PathVariable(required = true) Long id){
-        return ResponseEntity.ok().body(discountService.setDiscountToProduct(product, id));
+    public ResponseEntity<Product> setDiscountForProductByAdmin(@RequestParam Long productId, @PathVariable(required = true) Long id){
+        return ResponseEntity.ok().body(discountService.setDiscountToProduct(productId, id));
     }
 
     @PostMapping("/set-discount-by-user/{id}")
