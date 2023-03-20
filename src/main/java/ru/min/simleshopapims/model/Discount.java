@@ -18,8 +18,7 @@ public class Discount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotBlank
-    @NotNull
+
     @OneToMany(fetch = FetchType.LAZY)
     private List<Product> namesOfProducts;
     @NotNull

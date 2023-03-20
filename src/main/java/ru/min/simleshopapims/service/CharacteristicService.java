@@ -11,4 +11,6 @@ public interface CharacteristicService {
     void deleteCharacteristicById(Long id);
     Characteristic updateCharacteristic(Characteristic characteristic, Long id);
     List<Characteristic> findAll();
+
+    Characteristic findByName(String name);
 }

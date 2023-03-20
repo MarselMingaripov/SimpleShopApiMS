@@ -8,9 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "keyWords", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "name")
-})
+@Table(name = "keyWords")
 @Data
 @NoArgsConstructor
 public class KeyWord {

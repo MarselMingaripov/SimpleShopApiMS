@@ -9,6 +9,7 @@ import ru.min.simleshopapims.exception.NotFoundByIdException;
 import ru.min.simleshopapims.model.Organization;
 import ru.min.simleshopapims.model.OrganizationStatus;
 import ru.min.simleshopapims.repository.OrganizationRepository;
+import ru.min.simleshopapims.security.model.User;
 import ru.min.simleshopapims.security.repository.UserRepository;
 import ru.min.simleshopapims.service.OrganizationService;
 import ru.min.simleshopapims.service.ValidationService;
@@ -154,9 +155,8 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public Set<Organization> findOwnOrganizations(){
-        return userRepository.findUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
-                .getOrganizations();
+    public List<Organization> findOwnOrganizations(){
+        return organizationRepository.findAllByOwner(SecurityContextHolder.getContext().getAuthentication().getName());
     }
 
 }

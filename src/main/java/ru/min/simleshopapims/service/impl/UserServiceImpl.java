@@ -36,9 +36,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Double setBalance(String username, double amount) {
-        if (userRepository.existsByUsername(username)){
+        if (userRepository.existsByUsername(username)) {
             User user = userRepository.findUserByUsername(username);
             user.setBalance(user.getBalance() + amount);
+            userRepository.save(user);
             return user.getBalance();
         } else {
             throw new DontExistsByNameException("User not found!");
@@ -70,11 +71,12 @@ public class UserServiceImpl implements UserService {
                 purchaseService.createPurchase(purchase);
                 getCurrentUser().getPurchaseList().add(purchase);
                 List<Product> products = basketService.returnBasket().stream()
-                        .peek(x -> x.setStockBalance(productService.findByName(x.getName()).getStockBalance() - x.getStockBalance()))
+                        .peek(x -> x.setStockBalance(productService.findById(x.getId()).getStockBalance() - x.getStockBalance()))
                         .peek(x -> productService.updateProduct(x, x.getId()))
                         .peek(x -> organizationService.addProfit(x.getOrganization(),
                                 x.getOrganization().getProfit() + (x.getCost() - x.getCost() * 0.05)))
                         .collect(Collectors.toList());
+                getCurrentUser().setBalance(getCurrentUser().getBalance() - basketService.returnTotalCost());
                 basketService.returnBasket().clear();
                 return purchase;
             } else {
@@ -104,6 +106,7 @@ public class UserServiceImpl implements UserService {
                 Product returnedProduct = productService.findByName(product.getName());
                 returnedProduct.setStockBalance(returnedProduct.getStockBalance() + product.getStockBalance());
                 productService.updateProduct(returnedProduct, returnedProduct.getId());
+                getCurrentUser().setBalance(getCurrentUser().getBalance() + returnedProduct.getCost());
                 return purchaseService.updatePurchase(purchase, purchase.getId());
             } else {
                 throw new ItsTooLateException("Sorry, its too late to return your purchase. You can return it during a day!");
@@ -114,14 +117,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Product putGrade(Product product, int grade) {
+    public Product putGrade(Long id, int grade) {
         checkStatus(getCurrentUser());
         Grade gr = new Grade(grade);
-        if (getCurrentUser().getPurchaseList().contains(product)) {
+        if (getCurrentUser().getPurchaseList().contains(productService.findById(id))) {
             gradeService.createGrade(gr);
             Product pr = getCurrentUser().getPurchaseList().stream()
                     .flatMap(x -> x.getProducts().stream())
-                    .filter(v -> v.equals(product))
+                    .filter(v -> v.equals(productService.findById(id)))
                     .findFirst().get();
             List<Grade> gradeList = pr.getGrade();
             gradeList.add(gr);
@@ -133,14 +136,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Product putReview(Product product, String name, String review) {
+    public Product putReview(Long id, String name, String review) {
         checkStatus(getCurrentUser());
         Review rv = new Review(name, review, getCurrentUser().getUsername());
-        if (getCurrentUser().getPurchaseList().contains(product)) {
+        if (getCurrentUser().getPurchaseList().contains(productService.findById(id))) {
             reviewService.createReview(rv);
             Product pr = getCurrentUser().getPurchaseList().stream()
                     .flatMap(x -> x.getProducts().stream())
-                    .filter(v -> v.equals(product))
+                    .filter(v -> v.equals(productService.findById(id)))
                     .findFirst().get();
             Set<Review> reviews = pr.getReviews();
             reviews.add(rv);
@@ -157,13 +160,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AccountStatus changeAccountStatus(User user, AccountStatus accountStatus){
+    public AccountStatus changeAccountStatus(User user, AccountStatus accountStatus) {
         user.setAccountStatus(accountStatus);
         return accountStatus;
     }
 
     @Override
-    public List<Notification> readNotifications(){
+    public List<Notification> readNotifications() {
         List<Notification> notifications = getCurrentUser().getNotifications();
         return notifications.stream()
                 .filter(x -> x.getNotificationStatus().equals(NotificationStatus.NOT_READ))
@@ -172,18 +175,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<Notification> showAllNotifications(){
+    public List<Notification> showAllNotifications() {
+        readNotifications();
         return getCurrentUser().getNotifications();
     }
 
     @Override
-    public double addManyFromOrgToBalance(){
+    public double addManyFromOrgToBalance() {
         List<Organization> organizations = organizationService.findByOwner(getCurrentUser().getUsername());
-        for (Organization organization : organizations) {
-            getCurrentUser().setBalance(getCurrentUser().getBalance() + organization.getProfit());
-            organization.setProfit(0);
-            organizationService.updateOrganization(organization, organization.getId());
+        if (organizations != null) {
+            for (Organization organization : organizations) {
+                getCurrentUser().setBalance(getCurrentUser().getBalance() + organization.getProfit());
+                organization.setProfit(0);
+                organizationService.updateOrganization(organization, organization.getId());
+            }
+            return getCurrentUser().getBalance();
+        } else {
+            throw new NotFoundByIdException("Organizations not found!");
         }
-        return getCurrentUser().getBalance();
     }
 }

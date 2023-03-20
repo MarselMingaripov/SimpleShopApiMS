@@ -81,7 +81,8 @@ public class ProductController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Получить список всех продуктов с учетом скидки. Только админ")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Продукты успешно получены")})
+            @ApiResponse(responseCode = "200", description = "Продукты успешно получены"),
+            @ApiResponse(responseCode = "404", description = "Нет скидок на продукты")})
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<List<Product>> getAllProductsWithDiscount(){
         return ResponseEntity.ok().body(productService.findAllWithDiscount());

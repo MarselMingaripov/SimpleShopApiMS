@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.min.simleshopapims.exception.DontExistsByNameException;
 import ru.min.simleshopapims.exception.MyValidationException;
+import ru.min.simleshopapims.model.Characteristic;
 import ru.min.simleshopapims.model.KeyWord;
 import ru.min.simleshopapims.repository.KeyWordRepository;
 import ru.min.simleshopapims.service.KeyWordService;
@@ -23,7 +24,7 @@ public class KeyWordServiceImpl implements KeyWordService {
             if (!keyWordRepository.existsByName(keyWord.getName())){
                 return keyWordRepository.save(keyWord);
             } else {
-                throw new DontExistsByNameException("Current name is already in use");
+                return updateKeyWord(keyWord, keyWordRepository.findByName(keyWord.getName()).get().getId());
             }
         } else {
             throw new MyValidationException("KeyWord has invalid fields");
@@ -57,5 +58,10 @@ public class KeyWordServiceImpl implements KeyWordService {
     @Override
     public List<KeyWord> findAll() {
         return keyWordRepository.findAll();
+    }
+
+    @Override
+    public KeyWord findByName(String name){
+        return keyWordRepository.findByName(name).get();
     }
 }

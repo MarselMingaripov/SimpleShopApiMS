@@ -8,9 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "characteristic", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "name")
-})
+@Table(name = "characteristic")
 @Data
 @NoArgsConstructor
 public class Characteristic {
@@ -21,4 +19,8 @@ public class Characteristic {
     @NotNull
     @NotBlank
     private String name;
+
+    public Characteristic(String name) {
+        this.name = name;
+    }
 }

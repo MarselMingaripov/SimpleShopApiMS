@@ -11,4 +11,6 @@ public interface KeyWordService {
     void deleteKeyWordById(Long id);
     KeyWord updateKeyWord(KeyWord keyWord, Long id);
     List<KeyWord> findAll();
+
+    KeyWord findByName(String name);
 }

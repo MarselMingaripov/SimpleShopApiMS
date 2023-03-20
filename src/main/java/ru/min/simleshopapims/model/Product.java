@@ -2,6 +2,7 @@ package ru.min.simleshopapims.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -25,8 +26,7 @@ public class Product {
     @NotNull
     @NotBlank
     private String description;
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
     @JoinTable(name = "product_organization",
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "organization_id"))
@@ -34,30 +34,28 @@ public class Product {
     @NotNull
     private double cost;
     private int stockBalance;
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinTable(name = "product_discount",
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "discount_id"))
     private Discount discount;
-    @NotNull
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "product_reviews",
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "review_id"))
     private Set<Review> reviews;
-    @NotNull
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "product_keyWords",
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "keyWord_id"))
+    //@Cascade(value = org.hibernate.annotations.CascadeType.ALL)
     private Set<KeyWord> keyWords;
-    @NotNull
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "product_characteristics",
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "characteristic_id"))
-    private Characteristic characteristic;
+    //@Cascade(value = org.hibernate.annotations.CascadeType.ALL)
+    private Set<Characteristic> characteristic;
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "product_grades",
@@ -73,13 +71,13 @@ public class Product {
     private double avgGrade;
 
     public Product(String name, String description, Organization organization, double cost, int stockBalance,
-                   Discount discount, Set<KeyWord> keyWords, Characteristic characteristic) {
+                   Set<KeyWord> keyWords, Set<Characteristic> characteristic) {
         this.name = name;
         this.description = description;
         this.organization = organization;
         this.cost = cost;
         this.stockBalance = stockBalance;
-        this.discount = discount;
+        this.discount = null;
         this.keyWords = keyWords;
         this.characteristic = characteristic;
         this.productStatus = ProductStatus.PENDING;

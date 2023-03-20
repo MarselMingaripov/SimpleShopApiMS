@@ -19,7 +19,6 @@ public class Purchase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private LocalDate localDate;
-    @NotNull
     @OneToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "purchase_products",
             joinColumns = @JoinColumn(name = "purchase_id"),

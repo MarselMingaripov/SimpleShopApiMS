@@ -28,5 +28,5 @@ public interface OrganizationService {
 
     List<Organization> findByOwner(String owner);
 
-    Set<Organization> findOwnOrganizations();
+    List<Organization> findOwnOrganizations();
 }

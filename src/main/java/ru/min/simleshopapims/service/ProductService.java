@@ -30,4 +30,6 @@ public interface ProductService {
     Product setFrozenStatus(String organization, Product product);
 
     Product setActiveStatus(String organization, Product product);
+
+    Product findById(Long id);
 }

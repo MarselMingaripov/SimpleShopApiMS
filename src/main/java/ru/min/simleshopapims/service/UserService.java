@@ -20,9 +20,9 @@ public interface UserService {
 
     Purchase purchaseReturns(Product product);
 
-    Product putGrade(Product product, int grade);
+    Product putGrade(Long id, int grade);
 
-    Product putReview(Product product,String name, String review);
+    Product putReview(Long id,String name, String review);
 
     List<Purchase> findAllByCurrentUser();
 

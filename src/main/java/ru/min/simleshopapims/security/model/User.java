@@ -62,7 +62,7 @@ public class User {
     @JoinTable(	name = "user_organizations",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "organization_id"))
-    private Set<Organization> organizations = new HashSet<>();
+    private List<Organization> organizations = new ArrayList<>();
 
     public User() {
     }

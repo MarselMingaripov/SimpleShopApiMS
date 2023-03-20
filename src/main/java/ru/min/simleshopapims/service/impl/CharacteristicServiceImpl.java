@@ -25,7 +25,7 @@ public class CharacteristicServiceImpl implements CharacteristicService {
             if (!characteristicRepository.existsByName(characteristic.getName())) {
                 return characteristicRepository.save(characteristic);
             } else {
-                throw new DontExistsByNameException("Current name is already taken!");
+                return updateCharacteristic(characteristic, characteristicRepository.findByName(characteristic.getName()).get().getId());
             }
         } else {
             throw new MyValidationException("Characteristic has invalid fields");
@@ -59,5 +59,10 @@ public class CharacteristicServiceImpl implements CharacteristicService {
     @Override
     public List<Characteristic> findAll() {
         return characteristicRepository.findAll();
+    }
+
+    @Override
+    public Characteristic findByName(String name){
+        return characteristicRepository.findByName(name).get();
     }
 }

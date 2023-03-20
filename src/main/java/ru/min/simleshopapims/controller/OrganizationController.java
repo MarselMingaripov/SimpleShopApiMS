@@ -64,7 +64,7 @@ public class OrganizationController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Получить список всех организаций")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Организации успешно получены")})
+            @ApiResponse(responseCode = "200", description = "Организации успешно получены. Только админ")})
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<List<Organization>> getAllOrganizations(){
         return ResponseEntity.ok().body(organizationService.findAll());
@@ -85,7 +85,7 @@ public class OrganizationController {
 
     @PostMapping("/make-active/{name}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Установить организации статус активной")
+    @Operation(summary = "Установить организации статус активной. Только админ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Статус успешно установлен"),
             @ApiResponse(responseCode = "404", description = "Организация с таким именем не найдена")})
@@ -96,7 +96,7 @@ public class OrganizationController {
 
     @PostMapping("/make-frozen/{name}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Установить организации статус замороженной")
+    @Operation(summary = "Установить организации статус замороженной. Только админ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Статус успешно установлен"),
             @ApiResponse(responseCode = "404", description = "Организация с таким именем не найдена")})
@@ -107,7 +107,7 @@ public class OrganizationController {
 
     @PostMapping("/make-banned/{name}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Установить организации статус забаненной")
+    @Operation(summary = "Установить организации статус забаненной. Только админ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Статус успешно установлен"),
             @ApiResponse(responseCode = "404", description = "Организация с таким именем не найдена")})
@@ -118,7 +118,7 @@ public class OrganizationController {
 
     @GetMapping("/all-by-status/{status}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Получить список всех организаций по статусу")
+    @Operation(summary = "Получить список всех организаций по статусу. Только админ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Организации успешно получены")})
     @SecurityRequirement(name = "bearerAuth")
@@ -128,7 +128,7 @@ public class OrganizationController {
 
     @GetMapping("/all-by-user/{username}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Получить список всех организаций по пользователю")
+    @Operation(summary = "Получить список всех организаций по пользователю. Только админ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Организации успешно получены"),
             @ApiResponse(responseCode = "409", description = "Пользователь не найден")})
@@ -143,7 +143,7 @@ public class OrganizationController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Организации успешно получены")})
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<Set<Organization>> getAllOwnOrganizations(){
+    public ResponseEntity<List<Organization>> getAllOwnOrganizations(){
         return ResponseEntity.ok().body(organizationService.findOwnOrganizations());
     }
 }

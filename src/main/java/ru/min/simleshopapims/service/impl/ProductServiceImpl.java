@@ -11,12 +11,10 @@ import ru.min.simleshopapims.model.*;
 import ru.min.simleshopapims.repository.ProductRepository;
 import ru.min.simleshopapims.security.model.User;
 import ru.min.simleshopapims.security.repository.UserRepository;
-import ru.min.simleshopapims.service.DiscountService;
-import ru.min.simleshopapims.service.OrganizationService;
-import ru.min.simleshopapims.service.ProductService;
-import ru.min.simleshopapims.service.ValidationService;
+import ru.min.simleshopapims.service.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +26,8 @@ public class ProductServiceImpl implements ProductService {
     private final OrganizationService organizationService;
     private final UserRepository userRepository;
     private final DiscountService discountService;
+    private final CharacteristicService characteristicService;
+    private final KeyWordService keyWordService;
 
     /**
      * для админа создает активный продукт
@@ -39,6 +39,14 @@ public class ProductServiceImpl implements ProductService {
     public Product createProduct(Product product) throws MyValidationException {
         if (validationService.validateProduct(product)){
             product.setProductStatus(ProductStatus.ACTIVE);
+            /*product.getCharacteristic().stream()
+                    .forEach(characteristicService::createCharacteristic);
+            product.getKeyWords().stream()
+                    .forEach(keyWordService::createKeyWord);*/
+           /* Set<Product> products = product.getOrganization().getProducts();
+            products.add(product);
+            product.getOrganization().setProducts(products);
+            organizationService.updateOrganization(product.getOrganization(), product.getOrganization().getId());*/
             return productRepository.save(product);
         } else {
             throw new MyValidationException("Product has invalid fields!");
@@ -85,10 +93,16 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<Product> findAllWithDiscount() {
-        return productRepository.findAll().stream()
+        List<Product> products = productRepository.findAll().stream()
+                .filter(x -> x.getDiscount() != null)
                 .peek(x -> x.setCost(returnCostWithDiscount(x)))
                 .peek(x -> x.setAvgGrade(showAvgGrade(x.getId())))
                 .collect(Collectors.toList());
+        if (!products.isEmpty()){
+            return products;
+        } else {
+            throw new NotFoundByIdException("Discount not found!");
+        }
     }
 
     @Override
@@ -201,5 +215,14 @@ public class ProductServiceImpl implements ProductService {
             } else {
                 throw new NotFoundByIdException("Product not found!");
             }
+    }
+
+    @Override
+    public Product findById(Long id) {
+        if (productRepository.existsById(id)){
+            return productRepository.findById(id).get();
+        } else {
+            throw new NotFoundByIdException("Product not found!");
+        }
     }
 }
