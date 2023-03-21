@@ -2,6 +2,7 @@ package ru.min.simleshopapims.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.min.simleshopapims.model.enums.NotificationStatus;
 
 import javax.persistence.*;
 import java.time.LocalDate;

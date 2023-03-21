@@ -2,7 +2,7 @@ package ru.min.simleshopapims.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import ru.min.simleshopapims.model.Notification;
-import ru.min.simleshopapims.model.NotificationStatus;
+import ru.min.simleshopapims.model.enums.NotificationStatus;
 
 import java.util.List;
 

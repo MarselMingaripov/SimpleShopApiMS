@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.min.simleshopapims.model.Organization;
-import ru.min.simleshopapims.model.OrganizationStatus;
+import ru.min.simleshopapims.model.enums.OrganizationStatus;
 import ru.min.simleshopapims.model.Product;
 import ru.min.simleshopapims.model.dto.OrganizationDto;
 import ru.min.simleshopapims.service.OrganizationService;
@@ -81,7 +81,7 @@ public class OrganizationController {
             @ApiResponse(responseCode = "405", description = "Ошибка валидации полей организации"),
             @ApiResponse(responseCode = "409", description = "Создать организацию можно только на свое имя")})
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<Organization> applyToCreate(@RequestBody Organization organization){
+    public ResponseEntity<Organization> applyToCreate(@RequestBody OrganizationDto organization){
         return ResponseEntity.ok().body(organizationService.applyToCreateOrg(organization));
     }
 

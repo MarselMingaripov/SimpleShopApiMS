@@ -1,4 +1,4 @@
-package ru.min.simleshopapims.model;
+package ru.min.simleshopapims.model.enums;
 
 public enum OrganizationStatus {
 

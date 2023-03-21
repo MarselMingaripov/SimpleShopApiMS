@@ -3,10 +3,10 @@ package ru.min.simleshopapims.model;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.min.simleshopapims.model.enums.PurchaseStatus;
 import ru.min.simleshopapims.security.model.User;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 

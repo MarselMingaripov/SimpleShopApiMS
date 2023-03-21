@@ -55,8 +55,8 @@ public class DiscountController {
             @ApiResponse(responseCode = "404", description = "Скидка не найден"),
             @ApiResponse(responseCode = "405", description = "Ошибка валидации полей скидки")})
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<Discount> updateDiscount(@RequestBody Discount discount, @PathVariable(required = true) Long id){
-        return ResponseEntity.ok().body(discountService.updateDiscount(discount, id));
+    public ResponseEntity<Discount> updateDiscount(@RequestBody DiscountDto discountDto, @PathVariable(required = true) Long id){
+        return ResponseEntity.ok().body(discountService.updateDiscount(discountDto, id));
     }
 
     @GetMapping("/all")
@@ -89,8 +89,8 @@ public class DiscountController {
             @ApiResponse(responseCode = "404", description = "Скидка не найдена"),
             @ApiResponse(responseCode = "409", description = "Некоторые продукты в списке не удалось найти")})
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<List<Product>> setDiscountForListOfProductsByUser(@RequestBody List<Product> products, @PathVariable(required = true) Long id){
-        return ResponseEntity.ok().body(discountService.setDiscountToListOfOwnProducts(products, id));
+    public ResponseEntity<List<Product>> setDiscountForListOfProductsByUser(@RequestBody List<Long> productsId, @PathVariable(required = true) Long id){
+        return ResponseEntity.ok().body(discountService.setDiscountToListOfOwnProducts(productsId, id));
     }
 
     @PostMapping("/set-discount/{id}")
@@ -113,7 +113,18 @@ public class DiscountController {
             @ApiResponse(responseCode = "404", description = "Скидка не найдена"),
             @ApiResponse(responseCode = "409", description = "Некоторые продукты в списке не удалось найти")})
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<Product> setDiscountForProductByUser(@RequestBody Product product, @PathVariable(required = true) Long id){
-        return ResponseEntity.ok().body(discountService.setDiscountToOwnProduct(product, id));
+    public ResponseEntity<Product> setDiscountForProductByUser(@RequestParam Long productId, @PathVariable(required = true) Long id){
+        return ResponseEntity.ok().body(discountService.setDiscountToOwnProduct(productId, id));
+    }
+
+    @GetMapping("/all-products-by-discount-id/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Получить список продуктов по ид скидки")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Скидки успешно получены"),
+            @ApiResponse(responseCode = "404", description = "Скидка не найдена")})
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<List<Product>> getAllProductsById(@PathVariable Long id){
+        return ResponseEntity.ok().body(discountService.showListOfProductsByDiscountId(id));
     }
 }

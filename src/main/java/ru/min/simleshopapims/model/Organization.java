@@ -3,6 +3,7 @@ package ru.min.simleshopapims.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.min.simleshopapims.model.enums.OrganizationStatus;
 
 import javax.persistence.*;
 import java.util.Objects;

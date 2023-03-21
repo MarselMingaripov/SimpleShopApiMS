@@ -20,8 +20,8 @@ public class ValidationServiceImpl implements ValidationService {
     public boolean validateDiscount(Discount discount) {
 
         return (discount.getDiscountInPercent() > 0 &&
-                discount.getDiscountInPercent() < 100 &&
-                !discount.getStartOfDiscount().isAfter(LocalDate.now()) &&
+                discount.getDiscountInPercent() <= 100 &&
+                !discount.getStartOfDiscount().isBefore(LocalDate.now()) &&
                 discount.getEndOfDiscount().isAfter(LocalDate.now()));
     }
 

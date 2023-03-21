@@ -5,6 +5,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ru.min.simleshopapims.exception.*;
 import ru.min.simleshopapims.model.*;
+import ru.min.simleshopapims.model.enums.NotificationStatus;
+import ru.min.simleshopapims.model.enums.PurchaseStatus;
 import ru.min.simleshopapims.repository.PurchaseRepository;
 import ru.min.simleshopapims.security.model.AccountStatus;
 import ru.min.simleshopapims.security.model.User;
@@ -12,7 +14,6 @@ import ru.min.simleshopapims.security.repository.UserRepository;
 import ru.min.simleshopapims.service.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -69,6 +70,7 @@ public class UserServiceImpl implements UserService {
                 getCurrentUser().getPurchaseList().add(purchase);
                 List<Product> products = basketService.returnBasket().stream()
                         .peek(x -> x.setStockBalance(productService.findById(x.getId()).getStockBalance() - x.getStockBalance()))
+                        .filter(x -> productService.findById(x.getId()).getStockBalance() > x.getStockBalance())
                         .peek(x -> productService.updateProduct(x, x.getId()))
                         .peek(x -> organizationService.addProfit(x.getOrganization(),
                                 x.getOrganization().getProfit() + (x.getCost() - x.getCost() * 0.05)))

@@ -2,10 +2,7 @@ package ru.min.simleshopapims.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import ru.min.simleshopapims.model.ProductStatus;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import ru.min.simleshopapims.model.enums.ProductStatus;
 
 @Data
 @AllArgsConstructor

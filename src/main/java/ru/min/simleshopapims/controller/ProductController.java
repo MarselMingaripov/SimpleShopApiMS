@@ -100,7 +100,7 @@ public class ProductController {
         return ResponseEntity.ok().body(productService.findByName(name));
     }
 
-    @PostMapping("/apply-to-create-product")
+    @PostMapping("/apply-to-create-product/{organizationName}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @Operation(summary = "Подать заявку на добавление продукта")
     @ApiResponses(value = {
@@ -108,8 +108,8 @@ public class ProductController {
             @ApiResponse(responseCode = "405", description = "Ошибка валидации полей продукта"),
             @ApiResponse(responseCode = "409", description = "Вы можете добавлять продукты только в свои организации!")})
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<Product> applyToCreateProduct(@RequestBody Product product){
-        return ResponseEntity.ok().body(productService.applyToCreateProduct(product));
+    public ResponseEntity<Product> applyToCreateProduct(@RequestBody ProductDto productDto, @PathVariable String organizationName){
+        return ResponseEntity.ok().body(productService.applyToCreateProduct(productDto, organizationName));
     }
 
     @PostMapping("/set-active")

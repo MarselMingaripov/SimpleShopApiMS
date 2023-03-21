@@ -21,6 +21,7 @@ public class BasketServiceImpl implements BasketService {
     public List<Product> addToBasket(String productName){
         if (productRepository.existsByName(productName)){
             Product product = productRepository.findByName(productName).get();
+            product.setStockBalance(1);
             basket.add(product);
             return basket;
         } else {

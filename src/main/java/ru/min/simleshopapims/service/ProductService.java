@@ -24,7 +24,7 @@ public interface ProductService {
 
     double showAvgGrade(Long id);
 
-    Product applyToCreateProduct(Product product);
+    Product applyToCreateProduct(ProductDto product, String orgName);
 
     Product updateOwnProduct(Product product, Long id);
 

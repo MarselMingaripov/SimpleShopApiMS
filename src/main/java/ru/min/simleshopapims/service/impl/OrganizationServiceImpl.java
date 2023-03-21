@@ -7,7 +7,7 @@ import ru.min.simleshopapims.exception.DontExistsByNameException;
 import ru.min.simleshopapims.exception.MyValidationException;
 import ru.min.simleshopapims.exception.NotFoundByIdException;
 import ru.min.simleshopapims.model.Organization;
-import ru.min.simleshopapims.model.OrganizationStatus;
+import ru.min.simleshopapims.model.enums.OrganizationStatus;
 import ru.min.simleshopapims.model.Product;
 import ru.min.simleshopapims.model.dto.OrganizationDto;
 import ru.min.simleshopapims.repository.OrganizationRepository;
@@ -89,11 +89,12 @@ public class OrganizationServiceImpl implements OrganizationService {
     /**
      * для пользователя, создание организации со статусом ожидания
      *
-     * @param organization
+     * @param organizationDto
      * @return
      */
     @Override
-    public Organization applyToCreateOrg(Organization organization) {
+    public Organization applyToCreateOrg(OrganizationDto organizationDto) {
+        Organization organization = new Organization(organizationDto.getName(), organizationDto.getDescription(), organizationDto.getRefToLogo(), organizationDto.getOwner());
         if (validationService.validateOrganization(organization)) {
             if (!organizationRepository.existsByName(organization.getName())) {
                 String owner = userRepository.findUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).getUsername();
@@ -115,6 +116,13 @@ public class OrganizationServiceImpl implements OrganizationService {
         if (organizationRepository.existsByName(name)) {
             Organization organization = organizationRepository.findByName(name).get();
             organization.setOrganizationStatus(OrganizationStatus.ACTIVE);
+            User user = userRepository.findUserByUsername(organization.getOwner());
+            if (!user.getOrganizations().contains(organization)){
+                List<Organization> organizations = user.getOrganizations();
+                organizations.add(organization);
+                user.setOrganizations(organizations);
+                userRepository.save(user);
+            }
             return updateOrganization(organization, organization.getId());
         } else {
             throw new DontExistsByNameException("Organization not found!");
@@ -175,6 +183,15 @@ public class OrganizationServiceImpl implements OrganizationService {
     public Set<Product> getProductsByOrgName(String name){
         if (organizationRepository.existsByName(name)){
             return organizationRepository.findByName(name).get().getProducts();
+        } else {
+            throw new DontExistsByNameException("Organization not found!");
+        }
+    }
+
+    @Override
+    public Organization returnByName(String orgName){
+        if (organizationRepository.existsByName(orgName)){
+            return organizationRepository.findByName(orgName).get();
         } else {
             throw new DontExistsByNameException("Organization not found!");
         }

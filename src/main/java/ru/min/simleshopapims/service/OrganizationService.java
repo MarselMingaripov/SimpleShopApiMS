@@ -2,7 +2,7 @@ package ru.min.simleshopapims.service;
 
 import ru.min.simleshopapims.exception.MyValidationException;
 import ru.min.simleshopapims.model.Organization;
-import ru.min.simleshopapims.model.OrganizationStatus;
+import ru.min.simleshopapims.model.enums.OrganizationStatus;
 import ru.min.simleshopapims.model.Product;
 import ru.min.simleshopapims.model.dto.OrganizationDto;
 
@@ -18,7 +18,7 @@ public interface OrganizationService {
 
     void addProfit(Organization organization, double profit);
 
-    Organization applyToCreateOrg(Organization organization);
+    Organization applyToCreateOrg(OrganizationDto organizationDto);
 
     Organization makeActive(String name);
 
@@ -35,4 +35,6 @@ public interface OrganizationService {
     Organization findById(Long id);
 
     Set<Product> getProductsByOrgName(String name);
+
+    Organization returnByName(String orgName);
 }

@@ -50,7 +50,9 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
-    public Discount updateDiscount(Discount discount, Long id) {
+    public Discount updateDiscount(DiscountDto discountDto, Long id) {
+        Discount discount = new Discount(discountDto.getDiscountInPercent(), discountDto.getStartOfDiscount(), discountDto.getEndOfDiscount());
+        discount.setNamesOfProducts(discountRepository.findById(id).get().getNamesOfProducts());
         if (discountRepository.existsById(id)) {
             if (validationService.validateDiscount(discount)) {
                 Discount dc = discountRepository.findById(id).get();
@@ -94,8 +96,11 @@ public class DiscountServiceImpl implements DiscountService {
             productList.add(product);
         }
         if (productList.size() == productsId.size()) {
+            Discount discount = discountRepository.findById(discountId).get();
+            discount.setNamesOfProducts(productList);
+            discountRepository.save(discount);
             return productList.stream()
-                    .peek(x -> x.setDiscount(discountRepository.findById(discountId).get()))
+                    .peek(x -> x.setDiscount(discount))
                     .peek(productRepository::save)
                     .collect(Collectors.toList());
         } else {
@@ -122,7 +127,7 @@ public class DiscountServiceImpl implements DiscountService {
             List<Product> products = discount.getNamesOfProducts();
             products.add(pr);
             discount.setNamesOfProducts(products);
-            updateDiscount(discount, discount.getId());
+            discountRepository.save(discount);
             return productRepository.save(pr);
         } else {
             throw new DontExistsByNameException("Product not found!");
@@ -131,36 +136,35 @@ public class DiscountServiceImpl implements DiscountService {
 
     /**
      * для пользователя
-     * @param products
+     * @param productsId
      * @param discountId
      * @return
      */
     @Override
-    public List<Product> setDiscountToListOfOwnProducts(List<Product> products, Long discountId) {
+    public List<Product> setDiscountToListOfOwnProducts(List<Long> productsId, Long discountId) {
         if (!discountRepository.existsById(discountId)){
             throw new NotFoundByIdException("Discount not found!");
         }
-        User user = userRepository.findUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-        List<Product> productList = new ArrayList<>();
-        for (Product product : products) {
-            Product pr = user.getOrganizations().stream()
-                    .flatMap(x -> x.getProducts().stream())
-                    .filter(v -> v.equals(product))
-                    .findFirst().orElse(null);
-            if (pr != null) {
-                productList.add(pr);
+        for (Long param : productsId) {
+            if (!productRepository.existsById(param)){
+                throw new NotFoundByIdException("Some products not found!");
             }
         }
-        if (productList.size() == products.size()) {
-            Discount discount = discountRepository.findById(discountId).get();
-            List<Product> productsList = discount.getNamesOfProducts();
-            for (Product product : productList) {
-                productsList.add(product);
+        User user = userRepository.findUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        List<Product> productList = new ArrayList<>();
+        for (Long aLong : productsId) {
+            Product product = productRepository.findById(aLong).get();
+            if (user.getOrganizations().stream().flatMap(x -> x.getProducts().stream()).filter(v -> v.equals(product)).findAny().isPresent()){
+                productList.add(product);
             }
-            discount.setNamesOfProducts(productsList);
-            updateDiscount(discount, discount.getId());
-            return products.stream()
-                    .peek(x -> x.setDiscount(discountRepository.findById(discountId).get()))
+        }
+        if (productList.size() == productsId.size()) {
+            Discount discount = discountRepository.findById(discountId).get();
+
+            discount.setNamesOfProducts(productList);
+            discountRepository.save(discount);
+            return productList.stream()
+                    .peek(x -> x.setDiscount(discount))
                     .peek(productRepository::save)
                     .collect(Collectors.toList());
         } else {
@@ -171,26 +175,40 @@ public class DiscountServiceImpl implements DiscountService {
 
     /**
      * для пользователя
-     * @param product
+     * @param productId
      * @param discountId
      * @return
      */
     @Override
-    public Product setDiscountToOwnProduct(Product product, Long discountId) {
+    public Product setDiscountToOwnProduct(Long productId, Long discountId) {
         if (!discountRepository.existsById(discountId)){
             throw new NotFoundByIdException("Discount not found!");
         }
         User user = userRepository.findUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
         Product pr = user.getOrganizations().stream()
                 .flatMap(x -> x.getProducts().stream())
-                .filter(v -> v.equals(product))
+                .filter(v -> v.equals(productRepository.findById(productId)))
                 .findFirst().orElse(null);
         if (pr != null){
-            Product product1 = productRepository.findById(product.getId()).get();
-            product1.setDiscount(discountRepository.findById(discountId).get());
+            Product product1 = productRepository.findById(productId).get();
+            Discount discount = discountRepository.findById(discountId).get();
+            List<Product> products = discount.getNamesOfProducts();
+            products.add(product1);
+            discount.setNamesOfProducts(products);
+            discountRepository.save(discount);
+            product1.setDiscount(discount);
             return productRepository.save(product1);
         } else {
             throw new NotFoundByIdException("Product not found!");
+        }
+    }
+
+    @Override
+    public List<Product> showListOfProductsByDiscountId(Long id){
+        if (productRepository.existsById(id)) {
+            return discountRepository.findById(id).get().getNamesOfProducts();
+        } else {
+            throw new NotFoundByIdException("Discount not found!");
         }
     }
 }

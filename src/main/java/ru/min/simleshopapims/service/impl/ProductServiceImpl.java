@@ -6,9 +6,10 @@ import org.springframework.stereotype.Service;
 import ru.min.simleshopapims.exception.DontExistsByNameException;
 import ru.min.simleshopapims.exception.MyValidationException;
 import ru.min.simleshopapims.exception.NotFoundByIdException;
-import ru.min.simleshopapims.exception.OrgStatusException;
 import ru.min.simleshopapims.model.*;
 import ru.min.simleshopapims.model.dto.ProductDto;
+import ru.min.simleshopapims.model.enums.OrganizationStatus;
+import ru.min.simleshopapims.model.enums.ProductStatus;
 import ru.min.simleshopapims.repository.ProductRepository;
 import ru.min.simleshopapims.security.model.User;
 import ru.min.simleshopapims.security.repository.UserRepository;
@@ -42,14 +43,6 @@ public class ProductServiceImpl implements ProductService {
         Product product = new Product(productDto.getName(), productDto.getDescription(), productDto.getCost(), productDto.getStockBalance(), productDto.getProductStatus());
         if (validationService.validateProduct(product)) {
             product.setProductStatus(ProductStatus.ACTIVE);
-            /*product.getCharacteristic().stream()
-                    .forEach(characteristicService::createCharacteristic);
-            product.getKeyWords().stream()
-                    .forEach(keyWordService::createKeyWord);*/
-           /* Set<Product> products = product.getOrganization().getProducts();
-            products.add(product);
-            product.getOrganization().setProducts(products);
-            organizationService.updateOrganization(product.getOrganization(), product.getOrganization().getId());*/
             return productRepository.save(product);
         } else {
             throw new MyValidationException("Product has invalid fields!");
@@ -123,7 +116,7 @@ public class ProductServiceImpl implements ProductService {
             return product.getCost();
         }
         if (validationService.validateDiscount(product.getDiscount())) {
-            product.setCost(product.getCost() * product.getDiscount().getDiscountInPercent() / 100);
+            product.setCost(product.getCost() - (product.getCost() * product.getDiscount().getDiscountInPercent() / 100));
             return product.getCost();
         } else {
             throw new MyValidationException("Discount has invalid fields!");
@@ -155,14 +148,22 @@ public class ProductServiceImpl implements ProductService {
     /**
      * для пользователя, заявка на создание продукта
      *
-     * @param product
+     * @param productDto
      * @return
      */
     @Override
-    public Product applyToCreateProduct(Product product) {
+    public Product applyToCreateProduct(ProductDto productDto, String organizationName) {
+        Product product = new Product(productDto.getName(), productDto.getDescription(), productDto.getCost(), productDto.getStockBalance(), productDto.getProductStatus());
+        Organization organization = organizationService.returnByName(organizationName);
         if (validationService.validateProduct(product)) {
             User user = userRepository.findUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-            if (user.getOrganizations().contains(product.getOrganization())) {
+            if (user.getOrganizations().stream().anyMatch(x -> x.getOwner().equals(user.getUsername()))
+            && organization.getOrganizationStatus().equals(OrganizationStatus.ACTIVE)) {
+                product.setOrganization(organization);
+                Set<Product> products = organization.getProducts();
+                products.add(product);
+                organization.setProducts(products);
+                organizationService.updateOrganization(organization, organization.getId());
                 return productRepository.save(product);
             } else {
                 throw new DontExistsByNameException("You can add products only for your organization!");

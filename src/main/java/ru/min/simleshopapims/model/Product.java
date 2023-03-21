@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cascade;
+import ru.min.simleshopapims.model.enums.ProductStatus;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
