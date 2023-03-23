@@ -16,6 +16,7 @@ import ru.min.simleshopapims.security.repository.UserRepository;
 import ru.min.simleshopapims.service.OrganizationService;
 import ru.min.simleshopapims.service.ValidationService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -29,7 +30,6 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     /**
      * для админа, создание активной организации
-     *
      * @param organizationDto
      * @return
      * @throws MyValidationException
@@ -40,7 +40,13 @@ public class OrganizationServiceImpl implements OrganizationService {
         if (validationService.validateOrganization(organization)) {
             if (!organizationRepository.existsByName(organization.getName())) {
                 organization.setOrganizationStatus(OrganizationStatus.ACTIVE);
-                return organizationRepository.save(organization);
+                User user = userRepository.findUserByUsername(organization.getOwner());
+                List<Organization> organizations = new ArrayList<>();
+                organizations.add(organization);
+                user.setOrganizations(organizations);
+                Organization organization1 = organizationRepository.save(organization);
+                userRepository.save(user);
+                return organization1;
             } else {
                 throw new DontExistsByNameException("Current name is already taken");
             }
@@ -84,6 +90,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public void addProfit(Organization organization, double profit) {
         organization.setProfit(organization.getProfit() + profit);
+        organizationRepository.save(organization);
     }
 
     /**

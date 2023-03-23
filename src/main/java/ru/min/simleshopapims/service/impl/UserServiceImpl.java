@@ -62,22 +62,21 @@ public class UserServiceImpl implements UserService {
     public Purchase buy() {
         checkStatus(getCurrentUser());
         if (!basketService.returnBasket().isEmpty()) {
-            Purchase purchase = new Purchase(LocalDate.now(), basketService.returnBasket(), getCurrentUser(), basketService.returnTotalCost());
+            Purchase purchase = new Purchase(basketService.returnBasket(), getCurrentUser(), basketService.returnTotalCost());
             purchase.setPurchaseStatus(PurchaseStatus.INPROCESS);
             if (getCurrentUser().getBalance() >= basketService.returnTotalCost()) {
                 purchase.setPurchaseStatus(PurchaseStatus.COMPLETED);
                 purchaseService.createPurchase(purchase);
                 getCurrentUser().getPurchaseList().add(purchase);
-                List<Product> products = basketService.returnBasket().stream()
-                        .peek(x -> x.setStockBalance(productService.findById(x.getId()).getStockBalance() - x.getStockBalance()))
-                        .filter(x -> productService.findById(x.getId()).getStockBalance() > x.getStockBalance())
-                        .peek(x -> productService.updateProduct(x, x.getId()))
-                        .peek(x -> organizationService.addProfit(x.getOrganization(),
-                                x.getOrganization().getProfit() + (x.getCost() - x.getCost() * 0.05)))
-                        .peek(x -> organizationService.updateOrganization(x.getOrganization(), x.getOrganization().getId()))
-                        .collect(Collectors.toList());
                 getCurrentUser().setBalance(getCurrentUser().getBalance() - basketService.returnTotalCost());
                 userRepository.save(getCurrentUser());
+                List<Product> products = basketService.returnBasket().stream()
+                        .filter(x -> productService.findById(x.getId()).getStockBalance() >= x.getStockBalance())
+                        .peek(x -> x.getOrganization().setProfit(x.getOrganization().getProfit() + (x.getCost() - x.getCost() * 0.05)))
+                        .peek(x -> organizationService.updateOrganization(x.getOrganization(), x.getOrganization().getId()))
+                        .peek(x -> x.setStockBalance(productService.findById(x.getId()).getStockBalance() - x.getStockBalance()))
+                        .peek(x -> productService.updateProduct(x, x.getId()))
+                        .collect(Collectors.toList());
                 basketService.returnBasket().clear();
                 return purchase;
             } else {

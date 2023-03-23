@@ -32,8 +32,8 @@ public class Purchase {
     @Enumerated(EnumType.STRING)
     private PurchaseStatus purchaseStatus;
 
-    public Purchase(LocalDate localDate, List<Product> products, User user, double totalCost) {
-        this.localDate = localDate;
+    public Purchase(List<Product> products, User user, double totalCost) {
+        this.localDate = LocalDate.now();
         this.products = products;
         this.user = user;
         this.totalCost = totalCost;
