@@ -34,7 +34,7 @@ public class CharacteristicServiceImpl implements CharacteristicService {
 
     @Override
     public void deleteCharacteristicById(Long id) {
-        if (characteristicRepository.existsById(id)){
+        if (characteristicRepository.existsById(id)) {
             characteristicRepository.delete(characteristicRepository.findById(id).get());
         } else {
             throw new NotFoundByIdException("Characteristic not found by ID!");
@@ -43,8 +43,8 @@ public class CharacteristicServiceImpl implements CharacteristicService {
 
     @Override
     public Characteristic updateCharacteristic(Characteristic characteristic, Long id) {
-        if (characteristicRepository.existsById(id)){
-            if (validationService.validateCharacteristic(characteristic)){
+        if (characteristicRepository.existsById(id)) {
+            if (validationService.validateCharacteristic(characteristic)) {
                 Characteristic ch = characteristicRepository.findById(id).get();
                 ch.setName(characteristic.getName());
                 return characteristicRepository.save(ch);
@@ -62,7 +62,11 @@ public class CharacteristicServiceImpl implements CharacteristicService {
     }
 
     @Override
-    public Characteristic findByName(String name){
-        return characteristicRepository.findByName(name).get();
+    public Characteristic findByName(String name) {
+        if (characteristicRepository.existsByName(name)) {
+            return characteristicRepository.findByName(name).get();
+        } else {
+            throw new DontExistsByNameException("Characteristic not found!");
+        }
     }
 }
